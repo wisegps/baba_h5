@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>卡片管理</title>
+
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+</head>
+<style type="text/css">
+	.card_obj{line-height: 0em;display: table;width: 100%;padding: .5em 5%;border-bottom: 1px solid #ccc;background-color: #fff;}
+	.card_obj>div{line-height: 1em;display: table-cell;vertical-align: middle;}
+	.code{text-align: right;}
+	.card_name{line-height: 1.5em;font-size: .98em;}
+	.card_des{color: #aaa;font-size: .85em;}
+	.icon>.ico{font-size: 1.6em;left: auto;right: auto;}
+	.icon{width: 3em;line-height: 0em;position: relative;}
+	.ico_card_manage{font-size: 1.2em}
+	.delete{width: 15%;height: 100%;position: absolute;-webkit-transform: translate3d(-100%, 0, 0);-webkit-transition: -webkit-transform .4s;}
+	.obj_view{position: relative;}
+	.willC{-webkit-transform: translate3d(0, 0, 0);-webkit-transition: -webkit-transform .4s;pointer-events: none;}
+	.willC>div{display: table-cell;}
+	.obj_view.active>.delete{-webkit-transform: translate3d(0, 0, 0);}
+	.obj_view.active .willC{-webkit-transform: translate3d(20%, 0, 0);}
+
+	.z{z-index: 2;position: absolute;width: 100%;top: 0}
+	#main_div{position: relative;}
+	#cardId,[data-id=obj_id]{display: none;}
+</style>
+<body>
+	<div class="nav_top">
+		<div class="back_div" onclick="history.back()">
+			<span class="ico nav_icon_back"></span>
+		</div>
+		卡片管理
+		<div class="nav_ico_right" onclick="toAddCard()">
+	    	添加
+	    </div>
+	</div>
+
+	<div class="main" id="main_div">
+	</div>
+
+	<div class="child_view" id="add_card">
+		<div class="nav_top">
+			<div class="back_div" onclick="viewBack(this)">
+				<span class="ico nav_icon_back"></span>
+			</div>
+			添加卡片
+		</div>
+		<div class="main">
+		</div>
+	</div>
+
+	<div class="obj_view" id="cardId">
+		<div class="delete" onclick="deleteCard(this)">
+			<span class="ico ico_card_delete center_y"></span>
+		</div>
+		<div class="card_obj">
+			<div class="willC">
+				<div class="icon">
+					<span class="ico cardIcon center_y"></span>
+				</div>
+				<div style="display: table-cell;">
+					<div class="card_name">
+						cardName
+					</div>
+					<div class="card_des">
+						cardDes
+					</div>
+				</div>
+			</div>
+			<div class="code" onclick="showD(this)">
+				<span class="ico ico_card_manage"></span>
+			</div>
+		</div>
+	</div>
+
+	<div class="card_obj" data-id="obj_id" onclick="addCard(this)">
+		<div class="willC">
+			<div class="icon">
+				<span class="ico cardIcon center_y"></span>
+			</div>
+			<div style="display: table-cell;">
+				<div class="card_name">
+					cardName
+				</div>
+				<div class="card_des">
+					cardDes
+				</div>
+			</div>
+		</div>
+		<div class="code">
+			<span class="ico btn_right"></span>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var h,objArr,objView,lv,n,cardId,allCard=["air","map","car"];
+	var cardArr={
+		"air":{
+			"id":"air",
+			"icon":"ico_home_speed_voltage",
+			"name":"空气质量",
+			"des":"查看车内空气情况"
+		},
+		"map":{
+			"id":"map",
+			"icon":"ico_nav_trip",
+			"name":"地图",
+			"des":"实时显示车辆位置"
+		},
+		"car":{
+			"id":"car",
+			"icon":"ico_nav_health",
+			"name":"车况",
+			"des":"查看体检信息，驾驶指数"
+		}
+	}
+	reMake();
+
+	function saveCardId(){//保存当前显示卡片的记录
+		objArr=All("#main_div>.obj_view");
+		cardId=new Array();
+		for (var i = objArr.length - 1; i >= 0; i--) {
+			cardId.unshift(objArr[i].id);
+		};
+		setLS("card_id",cardId,1);
+	}
+
+	function reMake(){
+		if(!cardId)
+			cardId=LS("card_id",1)||allCard;
+		if(!cardId.length)
+			cardId=allCard;
+
+		var html=E("cardId").outerHTML;
+		var id,htm,all="";
+		for (var i=0;i<cardId.length;i++) {
+			id=cardId[i];
+			htm=html.replace("cardId",id).replace("cardIcon",cardArr[id].icon);
+			htm=htm.replace("cardName",cardArr[id].name).replace("cardDes",cardArr[id].des);
+			all+=htm;
+		};
+		E("main_div").innerHTML=all;
+		allLoad();
+	}
+
+	function allLoad(){
+		objArr=All("#main_div>.obj_view");
+		h=objArr[0].offsetHeight;
+		objView='<div class="obj_view" style="height:'+h+'px" id="tem"></div>';
+		$("#main_div>.obj_view").bind({"touchstart":touchS,"touchmove":touchM,"touchend":touchE});
+		$("#main_div .code").bind({"touchstart":sP,"touchmove":sP,"touchend":sP});
+		$("#main_div .delete").bind({"touchstart":sP,"touchmove":sP,"touchend":sP});
+	}
+
+	function touchS(){
+		//触摸事件
+		lv=this;
+		lv.c=lv.offsetTop;
+		lv.style.webkitTransform="translate3d(0,"+lv.c+"px,0)";
+		lv._eTop_=event.touches[0].screenY-lv.c;
+		
+
+		lv.className+=" z";
+	}
+	function touchM(){
+		lv.top=event.changedTouches[0].screenY-lv._eTop_;
+		lv.style.webkitTransform="translate3d(0,"+lv.top+"px,0)";
+		event.preventDefault();	
+
+		if(lv.top<lv.c)
+			n=parseInt(lv.top/h);
+		else 
+			n=parseInt(lv.top/h)+1;
+		if(n>objArr.length)return;
+		$("#tem").remove();
+		$(objArr[n]).before(objView);
+	}
+	function touchE(){
+		var tem=E("tem");
+		var m=E("main_div");
+		m.removeChild(lv);
+		lv.className="obj_view";
+		lv.style.webkitTransform=null;
+		if(!tem){
+			m.appendChild(lv);
+		}else{
+			m.insertBefore(lv,tem);
+			m.removeChild(tem);
+		}
+		saveCardId();
+	}
+
+	function showD(h){
+		$(h).parents('.obj_view').toggleClass('active');
+	}
+	function sP(){
+		event.stopPropagation();
+	}
+
+	function toAddCard(){
+		//打开添加卡片页
+		var delCard=allCard.filter(function(id){
+			for (var i = cardId.length - 1; i >= 0; i--) {
+				if(cardId[i]==id)return false;
+			};
+			return true;
+		});
+		var html=C("[data-id=obj_id]").outerHTML;
+		var id,htm,all="";
+		for (var i = delCard.length - 1; i >= 0; i--) {
+			id=delCard[i];
+			htm=html.replace("obj_id",id).replace("cardIcon",cardArr[id].icon);
+			htm=htm.replace("cardName",cardArr[id].name).replace("cardDes",cardArr[id].des);
+			all+=htm;
+		};
+		C("#add_card>.main").innerHTML=all;
+		callView("add_card");
+	}
+
+	function addCard(h){
+		//添加卡片
+		var id=h.getAttribute("data-id");
+		cardId.push(id);
+		reMake();
+		saveCardId();
+		h.parentElement.removeChild(h);
+	}
+	function deleteCard(h){
+		var p=h.parentElement;
+		p.parentElement.removeChild(p);
+		saveCardId();
+	}
+</script>
+</html>

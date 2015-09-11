@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>绑定终端</title>
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+</head>
+<style type="text/css">
+	body{background: #fff}
+	.main{background: #fff;padding-bottom: 1em}
+	.main>*{padding: 0 .5em}
+	.main>p{margin: .5em 0;padding:.5em;background-color: #eee}
+	.form-control.nobor{width: auto;border: none;box-shadow: none;}
+	.code{display: inline-block;float: right;height: 40px;position: relative;width: 40px;}
+</style>
+<body>
+	<div class="nav_top">
+		<div class="back_div" onclick="iframeViewBack('add_device')">
+	        <span class="ico nav_icon_back"></span>
+	    </div>
+		绑定终端
+		<div class="nav_ico_right">
+	    	<span class="ico nav_icon_ok_nor" onclick="save()"></span>
+	    </div>
+	</div>
+	<div id="main_div" class="main">
+		<p>请扫描终端的二维码或者输入对应的序列号进行绑定（<a href="http://api.bibibaba.cn/help/obd">常用OBD安装位置</a>）</p>
+		<div>
+			<div style="border-bottom: 1px solid #ccc;">
+				<label style="width:5em">序列号</label>
+				<input id="serial" class="form-control nobor" style="margin-left: .8em;" onchange="checkSerial()">
+				<div class="code" onclick="makeQRcode()">
+		            <span class="ico ewm center_y"></span>
+		        </div>
+			</div>
+			<div>
+				<label style="width:5em">SIM卡号</label>
+				<input class="form-control nobor" id="sim">
+			</div>
+		</div>
+		<p>以下是我们收集及车友分享的OBD接口实景图片，我为人人，人人为我，如果以下暂时无法显示您对应车型的图片，请立即拍照，分享您的宝贵经验</p>
+		<div style="border-top: 1px solid #ccc;">
+			<div style="line-height:2.5em;">车辆型号：<span id="car_series"></span></div>
+			<table rules="all" frame="box" style="margin-bottom:1em">
+				<tr>
+					<td>近景图</td>
+					<td>远景图</td>
+				</tr>
+				<tr>
+					<td>请点击拍照，立即分享您的宝贵经验，如一经采用，我们将会给予5元现金劵奖励。</td>
+					<td>请点击拍照，立即分享您的宝贵经验，如一经采用，我们将会给予5元现金劵奖励。</td>
+				</tr>
+			</table>
+			<button class="form-control" style="color: #fff;background-color: #11BB9B;">我要分享</button>
+		</div>
+	</div><!--
+	<div class="Wback">
+		<div class="alert_tip">正在绑定，请稍候……</div>
+	</div>-->
+</body>
+<script type="text/javascript">
+	var canAdd,device_id,carJson;
+	var _custId_=LS('cust_id');//用户id
+
+	function checkSerial(){
+		//检测序列号
+		var serial=E("serial").value;
+		$.ajax({
+			url:_apiUrl_+"device/serial/"+serial+"?auth_code="+_authCode_,
+			type:"GET",
+			dataType: "json",
+			success:function(json){
+				if(json.status_code){
+					statusCode(json.status_code);
+					return;
+				}
+				if (json.status<2){
+					E("sim").value=json.sim;
+				} else if(json.status==2) {
+					alert("序列号已经使用");
+				}
+			},
+			error:function(XMLHttpRequest, textStatus, errorThrown){
+				if(!XMLHttpRequest.readyState)
+					alert("该序列号不存在");
+			}
+		});
+	}
+	function save(){
+		//提交
+		tip("正在绑定，请稍候……");
+		var serial=E("serial").value;
+		$.ajax({
+			url:_apiUrl_+"device/serial/"+serial+"?auth_code="+_authCode_,
+			type:"GET",
+			dataType: "json",
+			success:function(json){
+				if(json.status_code){
+					statusCode(json.status_code);
+					return;
+				}
+				var custID=json.cust_id;
+				if(custID ==_custId_||custID==0){
+					device_id =json.device_id;
+					updateSim();
+				}else{
+					alert("该终端已被其他用户绑定，无法再次绑定");
+					return;
+				}
+				updateSim();//把sim号绑定到设备
+			},
+			error:function(XMLHttpRequest, textStatus, errorThrown){
+				if(!XMLHttpRequest.readyState)
+					alert("该序列号不存在");
+			}
+		});
+	}
+
+
+	function updateSim(){//把sim号绑定到设备
+		var sim=E("sim").value;
+		var simUrl =_apiUrl_+"device/"+device_id+"/sim?auth_code="+_authCode_;
+		$.ajax({
+			url:simUrl,
+			type:"PUT",
+			dataType: "json",
+			data:{"sim":sim},
+			success:function(json){
+				if(json.status_code){
+					statusCode(json.status_code);
+					return;
+				}
+				updateDevice();//把设备绑定到用户
+			}
+		});
+	}
+
+	function updateDevice(){//把设备绑定到用户
+		var deviceUrl =_apiUrl_+"device/"+device_id+"/customer?auth_code="+_authCode_;
+		$.ajax({
+			url:deviceUrl,
+			type:"PUT",
+			dataType: "json",
+			data:{"cust_id":_custId_},
+			success:function(json){
+				if(json.status_code){
+					statusCode(json.status_code);
+					return;
+				}
+				updateDeviceToCar()//把设备绑定到车辆
+			},
+			error:function(XMLHttpRequest, textStatus, errorThrown){
+				if(!XMLHttpRequest.readyState)
+					alert("未知错误");
+			}
+		});
+	}
+
+	function updateDeviceToCar(){
+		//把设备绑定到车辆
+		car_id=carJson.obj_id;
+		var DCarUrl =_apiUrl_+"vehicle/"+car_id+"/device?auth_code="+_authCode_;
+		$.ajax({
+			url:DCarUrl,
+			type:"PUT",
+			dataType: "json",
+			data:{"device_id":device_id},
+			success:function(json){
+				if(json.status_code){
+					statusCode(json.status_code);
+					return;
+				}
+				//绑定结束
+				window.parent.getCusCar(function(json){carJson=json});
+				alert("绑定成功",function(){
+					iframeViewBack('add_device');
+				})
+			},
+			error:function(XMLHttpRequest, textStatus, errorThrown){
+				if(!XMLHttpRequest.readyState)
+					alert("未知错误");
+			}
+		});
+	}
+
+	function preset(){
+		carJson=LS("carJson",1);
+		var carSeries
+		if(carJson.car_series_id!=carJson.car_type_id)
+			carSeries=carJson.car_series+carJson.car_type;
+		else
+			carSeries=carJson.car_series;
+		E("car_series").innerText=carSeries;
+	}
+</script>
+</html>

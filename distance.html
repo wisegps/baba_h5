@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>里程详细界面</title>
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript">
+      var type="total_distance";
+      var lineTitle="里程";
+      var title="distance";
+      var getVal=".fuel.slice(0,-1)";
+    </script>
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+    <script type="text/javascript" src="js/Chart.js"></script>
+    <script type="text/javascript" src="js/DFF_public.js"></script>
+  </head>
+  <body>
+  <div class="nav_top">
+    <div style="padding-left:1.2em;position: absolute;" onclick="history.back()">
+      <span class="ico nav_icon_back"></span>
+    </div><t id="car_name">车名</t></div>
+  <div class="nav_top" style="top: auto;bottom: 0;background-color: #14C79E;" onclick="callView('rank')">油耗排行榜</div>
+
+  <div id="main_body">
+    <div style="border-bottom: 1px solid #ccc;">
+      <div class="car_nav" style="line-height: 40px;border: 1px solid #14C79E;border-radius: 5px;">
+        <div id="nav_day" onclick="changeView(this)">
+          <h3>日</h3>
+        </div><div id="nav_week" style="border-color:#14C79E" onclick="changeView(this)">
+          <h3>周</h3>
+        </div><div id="nav_month" class="active" onclick="changeView(this)">
+          <h3>月</h3>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h4 id="date">日期时间</h4>
+      <div id="circle" style="position: relative;">
+        <div style="padding-left:1.2em;position: absolute;line-height: 10em;">
+          <span class="ico btn_jiantou_lvse_you" onclick="next(false)"></span>
+        </div>
+        <div style="padding-right:1.2em;position: absolute;right:0px;line-height: 10em;">
+          <span class="ico btn_jiantou_lvse_zuo" style="display:none" onclick="next(true)"></span>
+        </div>
+        <div name="circle">
+            <h5>总行驶</h5>
+            <h3><t id="distance">000</t><small>km</small></h3>
+        </div>
+        <div class="car_nav">
+            <div>
+              <h5>总花费</h5>
+              <h3><small>￥</small><t name="fee">000</t></h3>
+            </div><div>
+              <h5>总油耗</h5>
+              <h3><t name="fuel">00.0</t><small>L</small></h3>
+            </div><div>
+              <h5>平均油耗</h5>
+              <h3><t name="avg_fuel">000</t><small>L/100km</small></h3>
+            </div>
+          </div>
+      </div>
+    </div>
+    <div id="line">
+      <t style="float:left;color:#555">km</t>
+      <h4 class="title" id="Line_title" style="margin: 0;text-align: right;">里程月曲线</h4>
+      <canvas id="Line" style="width:100%;height:30vh"></canvas>
+    </div>
+    <div id="pie">
+      <h4 class="title">里程-油耗图</h4>
+      <canvas id="Doughnut" style="width:100%;height:30vh"></canvas>
+      <h4 class="title" id="speed_text">怠速</h4>
+      <h4 class="title">里程：<t id="title_distance">0</t></h4>
+      <h4 class="title">油耗：<t id="title_fuel">0</t></h4>
+    </div>
+  </div>
+  <div class="child_view" id="rank" style="padding: 0;">
+    <iframe src="rank.html"></iframe>
+  </div>
+  <style>
+  .title{margin:5px;font-weight: 100;text-align: center;color: #14C79E;}
+  #circle .car_nav>div{color:#082D57}
+  [name=circle]{width: 10em;height: 10em;border: .5em solid #14C79E;margin:10px auto;border-radius: 50%;text-align: center;padding-top: 2.5em;color: #082D57}
+  [name=circle] h3{margin: .2em 0;}
+  .btn_jiantou_lvse_you{font-size: 1.5em;}
+  .btn_jiantou_lvse_zuo{font-size: 1.5em;}
+  #date{color: #14C79E;font-weight: 100;text-align: center;margin: 0;}
+  body{background: #fff;padding-bottom: 50px}
+  #main_body>div{padding:10px}
+  .car_nav>div{color:#14C79E}
+  .car_nav>.active{background: #14C79E;color: #fff;}
+  </style>
+  </body>
+</html>

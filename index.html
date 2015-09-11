@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Pragma" content="no-cache">
+  
+  <title>登录界面</title>
+
+  <link rel="stylesheet" type="text/css" href="css/main.css?a=0">
+  <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+  <script type="text/javascript" src="js/jQuery.md5.js"></script>
+  <script type="text/javascript" src="js/public.js"></script>
+</head>
+<style>
+body{height: 100vh;}
+.card_body{text-align: center;}
+form a{text-decoration:none;color: #123;margin-top: .5em}
+.form-control{margin: 8px 0;}
+#mainCard{margin: 0;padding: 1.5em .3em;height: 100%;text-align: center;}
+img{width: 4em;border-radius: 2em}
+#weixin{display: none}
+</style>
+<body>
+  <div class="loading_back">
+    <div class="loading"></div>
+    <span>登录中……</span>
+  </div>
+  <script type="text/javascript" src="js/login.js"></script>
+  <div class="nav_top">登录叭叭</div>
+  <div class="card" id="mainCard">
+    <div class="card_body">
+      <div id="login_view">
+      <form id="login_font">
+      	<input type="text" name="account" class="form-control" placeholder="请输入账号">
+        <input type="password" name="password" class="form-control" placeholder="请输入密码">
+        <a href="javascript:$('#register').show()" style="float:left;padding: 0 12px;">注册</a> <a href="javascript:callSMS(this,2)" style="float:right">忘记密码？</a>
+      </form>
+      </div>
+      <input type="submit" onclick="login()" class="form-control" value="登录" style="background:#ECA610;color:#fff;margin-top: 4em;">
+    </div>
+  </div>
+
+  <div id="register" class="child_view">
+    <div class="nav_top">
+      <div class="back_div" onclick="viewBack(this)">
+        <span class="ico nav_icon_back"></span>
+      </div>
+      注册
+    </div>
+    <div style="padding:1em .5em">
+      <input type="text" id="register_account" class="form-control" placeholder="请输入手机号或邮箱">
+      <input type="submit" onclick="register()" class="form-control" value="注册" style="color:#fff;background:#1BADED">
+      <p style="font-size: .9em;">点击上面的注册按钮，即表示同意《<a target="_blank" href="http://api.bibibaba.cn/help/fwtk" style="color:#3C96F0">叭叭软件许可及服务条款</a>》</p>
+    </div>
+  </div>
+
+  <div id="SMS" class="child_view no_pad">
+    <iframe src="SMS_verification.html"></iframe>
+  </div>
+</body>
+</html>

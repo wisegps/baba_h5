@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>通知</title>
+
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+</head>
+<style type="text/css">
+	body{background-color: #fff;height: 100%}
+	.nav_div h4{width: 20%;}
+	#msg_list{width: 100%;overflow: hidden;height: 100%;position: relative;}
+	.list_view{width: 500%;-webkit-transform: translate3d(-40%,0,0);height: 100%;background-color: #fff}
+	.tLeft{-webkit-transition: transform .5s;}
+	.list_view>div{display: inline-block;width: 20%;border-bottom: 1px solid #aaa;vertical-align: top;height: 100%;overflow-y: auto;}
+	.msg{color: #123;line-height: 2em}
+	.msg_title{background-color: #E7F7F4;line-height: 2.5em;padding: 0 .5em;}
+	.msg h4{margin: 0;font-weight: 100;}
+	.msg h4>span{color: #6C7176;float: right;}
+	.msg_body{padding: .5em}
+	.main{height: 100%}
+	.refresh{width: 100%;position: absolute;text-align: center;color: #228BBF;z-index: -1;}
+</style>
+<body>
+	<div class="nav_top">
+	    <div class="back_div" onclick="history.back()">
+	      <span class="ico nav_icon_back"></span>
+	    </div>
+	    通知
+    </div>
+    <div class="main">
+    	<div class="nav_div">
+    		<div>
+    			<h4 onclick="changeList(0)">车务</h4><h4 onclick="changeList(1)">故障</h4><h4 onclick="changeList(2)">报警</h4><h4 onclick="changeList(3)">违章</h4><h4 onclick="changeList(4)">其他</h4>
+    		</div>
+    	</div>
+    	<div id="msg_list">
+    		<div class="list_view tLeft">
+	    		<div id="task">
+	    		</div><div id="fault">
+	    		</div><div id="warning">
+	    		</div><div id="violation">
+	    		</div><div id="else">
+	    		</div>
+	    	</div>
+	    	<div class="refresh" style="top: 60px;">
+	    		下拉刷新<br>
+	    		<img src="img/refresh_arrow_down.png">
+	    	</div>
+	    	<div class="refresh" style="bottom: 0;">
+	    		上拉刷新
+	    	</div>
+	    	<div class="loading_back"><div class="loading"></div></div>
+    	</div>
+    </div>
+</body>
+<script type="text/javascript">
+	var _custId_=LS('cust_id');//用户id
+	var lv,ls,_lORt_,_carW_;//list_view,当前显示列表
+
+	window.onload=function(){
+		_carW_=E("msg_list").clientWidth;
+		lv=C(".list_view");
+		ml=E("msg_list");
+		changeList(0);
+		changeList(1);
+		changeList(3);
+		changeList(4);
+		changeList(2);
+		lv.addTouchF(touchCar,moveCar,endCar);
+	}
+
+	function changeList(i){
+		//切换列表
+		$(".nav_div h4:eq("+i+")").addClass("active").siblings().removeClass("active");
+		getAndShow(i);
+	}
+
+	function getAndShow(i){//获取并展示该类型的信息
+		var type=i;
+		if(type==4)type=-1;//类型索引修正
+		type++;
+
+		slideTo(i);
+		var id=["else","task","fault","warning","violation"];
+		var list=E(id[type]);
+		var noti_id="";
+		if(list.is_load)return;
+		if(list.getAttribute("data-has")){
+			if(_lORt_=="bottom"){
+				//如果列表已经拉到最底，则继续获取更下面的内容
+				noti_id="&min_id="+list.getAttribute("data-noti_id");
+			}else if(_lORt_!="top")
+				return;
+		}
+		_lORt_="else";
+		list.is_load=true;//防止获取数据时用户再发起请求数据
+		$(".loading_back").show();
+		$.ajax({
+			url:_apiUrl_+"customer/"+_custId_+"/notification?auth_code="+_authCode_+"&msg_type="+type+noti_id,
+			type:"GET",
+			dataType:"json",
+			success:function(json){
+				if(json.status_code){
+					statusCode(json.status_code);
+					return;
+				}
+				var title=["系统消息","车务提醒","车辆故障","车辆报警","违章提醒"];
+				
+				var ht='<div class="msg"><div class="msg_title"><h4>'+title[type]+'<span>rcv_time</span></h4></div><div class="msg_body">content</div></div>';
+				var h,date,htm="";
+				for (var j=0;j<json.length;j++){
+					date=json[j].rcv_time.replace(/[A-z]/g," ").replace(/\.\d*/g,"");
+					htm+=ht.replace("content",json[j].content).replace("rcv_time",date);
+				};
+				if(noti_id)
+					list.innerHTML+=htm;
+				else
+					list.innerHTML=htm;
+				list.setAttribute("data-has","true");
+				if(j)
+					list.setAttribute("data-noti_id",json[j-1].noti_id);
+				list.is_load=false;
+				$(".loading_back").hide();
+			}
+		});
+	}
+
+	function slideTo(i){
+		lv.className="list_view tLeft";
+		lv.data_l=(20*i/100)*lv.scrollWidth;
+		lv.style.webkitTransform="translate3d(-"+lv.data_l+"px,0,0)";
+		ls=C(".list_view>div:nth-of-type("+(i+1)+")");
+	}
+
+
+	function touchCar(){//触摸开始事件
+		lv.time=new Date().getTime();//记录当前时间，计算滑动速度时使用
+		lv.className=lv.className.replace(/tLeft/g,"");
+		window._eLeft_=event.touches[0].screenX;
+		window._eTop_=event.touches[0].screenY;
+		window._lW_=-_eLeft_-lv.data_l;
+		_lORt_=null;//左右滑动还是上下滑动的标志位
+	}
+	function moveCar(){//触摸移动事件
+		var top=event.changedTouches[0].screenY-_eTop_;
+		var _top=Math.abs(top);
+		if(!_lORt_){
+			var left=Math.abs(_eLeft_-event.changedTouches[0].screenX);
+			if(left>_top)_lORt_="left";
+			else if(!ls.scrollTop&&top>0)
+				_lORt_="top";
+			else if((ls.scrollHeight-ls.offsetHeight-ls.scrollTop)<3&&top<0)
+				_lORt_="bottom";
+		}
+		if(_lORt_=="left"){
+			lv.style.webkitTransform="translate3d("+(_lW_+event.changedTouches[0].screenX)+"px,0,0)";//左右滑动
+			event.preventDefault();		
+		}else if(_top<100&&(_lORt_=="top"||_lORt_=="bottom")){
+			lv.style.webkitTransform="translate3d(-"+lv.data_l+"px,"+top+"px,0)";//下拉刷新
+			event.preventDefault();	
+		}
+	}
+	function endCar(){//触摸结束事件
+		var a,left=_lW_+event.changedTouches[0].screenX;//
+		var b=left/-_carW_;
+		a=Math.round(b);
+		
+		if(_lORt_=="left"){
+			var s=event.changedTouches[0].screenX-_eLeft_;
+			var time=new Date().getTime()-lv.time;//滑动所经历的时间长度
+			var v=s/time;//滑动的平均速度
+			a=Math.round(b+0.2*(-v)/Math.abs(v));
+			if(v>0.8){
+				a=Math.floor(b);
+			}else if(v<-0.8){
+				a=Math.ceil(b);
+			}
+		}else if(_lORt_=="top"||_lORt_=="bottom"){
+			var s=Math.abs(event.changedTouches[0].screenY-_eTop_);
+			if(s<100)_lORt_="else";
+		}
+		if(a>4)a=4;
+		if(a<0)a=0;
+		changeList(a);
+	}
+</script>
+</html>

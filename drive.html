@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>驾驶指数</title>
+
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+  <script type="text/javascript" src="js/public.js"></script>
+  <script type="text/javascript" src="js/drive.js"></script>
+</head>
+<style>
+  body{padding-bottom: 60px}
+  .card_body{text-align: center;}
+  .circle.w_50 img{width: 60%;left: 20%;}
+  .card,nav{box-shadow: none;margin: 10px 0 0 0;}
+  .card:last-of-type{border:none;}
+  nav{border-top: 1px solid #ccc}
+  nav>div{width: 50%}
+  nav h4{color: #1BADED;margin: 0;line-height: 39px;font-weight: 100;font-size: 1.8em;}
+</style>
+<body>
+  <div class="nav_top">
+    <div style="padding-left:1.2em;position: absolute;" onclick="history.back()">
+      <span class="ico nav_icon_back"></span>
+    </div>
+    驾驶指数明细
+  </div>
+  <nav class="nav">
+      <div>
+        <a href="javascript:callView('rank')">
+          <h4 style="border-right:1px solid #ccc"><span class="ico ico_drive_index" ></span> 驾驶排行</h4>
+        </a>
+      </div><div>
+        <a href="drive_travel.html">
+          <h4><span class="ico ico_travel_details"></span> 行程明细</h4>
+        </a>
+      </div>
+  </nav>
+
+  <div class="card">
+    <div class="card_nav">
+      <h4 style="margin: 0;line-height: 29px;color: #1BADED;font-weight: 100;text-align: center;">
+        <span class="ico ico_drive_date_left" onclick="next(false)"></span>
+        &nbsp;&nbsp;<t id="date">当前日期</t>&nbsp;&nbsp;
+        <span class="ico ico_drive_date_right" onclick="next(true)"></span>
+      </h4>
+    </div>
+    <div class="card_body">
+      <div class="card_head">
+        <span id="car_name">车名</span>
+        <h4 name="address" style="color:#7ECCEF"><span class="ico ico_location_on"></span><t id="car_address">车辆地址信息</t></h4>
+      </div>
+        <div class="circle w_50" name="drive">
+          <img src="img/circle_dial_color.png">
+          <div class="shan">
+            <div name="1"></div>
+            <div name="2"></div>
+            <div name="0"></div>
+            <div name="3"></div>
+          </div>
+          <img src="img/circle_cursor.png" class="circle_turn" style="animation-play-state:paused;-webkit-animation-play-state:paused;">
+          <img src="img/circle_cover.png">
+          <div class="circle_content">
+          <h4>驾驶指数</h4>
+          <h2><t name="score">0</t><small>分</small></h2>
+          </div>
+        </div>
+      <div class="car_nav">
+        <div>
+          <h3 id="safe_score">00</h3>
+          <h5>
+            <span class="ico ico_drive_safe"></span>
+            安全指数
+          </h5>
+        </div><div>
+          <h3 id="eco_score">00</h3>
+          <h5>
+            <span class="ico ico_drive_save"></span>
+            经济指数
+          </h5>
+        </div><div>
+          <h3 id="env_score">00</h3>
+          <h5>
+            <span class="ico ico_drive_green"></span>
+            环保指数
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card_nav" style="border:none">
+      <h4 style="margin: 0;line-height: 29px;font-weight: 100;">驾驶评价及建议</h4>
+    </div>
+    <div class="car_nav" style="margin-top:5px">
+        <div>
+          <h3 id="quick_accel">0</h3>
+          <h5>
+            <span class="ico ico_drive_spd_up"></span>
+            急加速
+          </h5>
+        </div><div>
+          <h3 id="quick_break">0</h3>
+          <h5>
+            <span class="ico ico_drive_spd_down"></span>
+            急减速
+          </h5>
+        </div><div>
+          <h3 id="quick_reflexes">0</h3>
+          <h5>
+            <span class="ico ico_drive_spd_stop"></span>
+            急转弯
+          </h5>
+        </div>
+      </div>
+      <h5 style="margin: 10px 0;font-weight: 100;padding-left: 5px;" id="drive_advice">没有驾驶建议</h5>
+  </div>
+  <div class="card">
+    <div class="card_nav" style="border:none">
+      <h4 style="margin: 0;line-height: 29px;font-weight: 100;">行车概况</h4>
+    </div>
+    <div class="car_nav">
+      <div>
+        <h3><t id="total_distance">000</t><small>km</small></h3>
+        <h5>
+          <span class="ico ico_drive_distance"></span>
+          总行驶
+        </h5>
+      </div><div>
+        <h3><t id="total_fuel">00.0</t><small>L</small></h3>
+        <h5>
+          <span class="ico ico_drive_gas_total"></span>
+          总油耗
+        </h5>
+      </div><div>
+        <h3><t id="avg_fuel">000</t><small>L/100km</small></h3>
+        <h5>
+          <span class="ico ico_drive_gas_avg"></span>
+          平均油耗
+        </h5>
+      </div>
+    </div>
+  </div>
+  <div class="child_view" id="rank" style="padding: 0;">
+    <iframe src="rank.html?rank=drive_rank"></iframe>
+  </div>
+</body>
+</html>

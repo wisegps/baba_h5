@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>选择车型</title>
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+  </head>
+  <body style="padding-top:100px;overflow: hidden;height: 100vh;">
+    <div class="nav_top">
+      <div class="back_div" onclick="window.parent.hideCarSeries()">
+        <span class="ico nav_icon_back"></span>
+      </div>
+      选择品牌
+      <div style="padding: 0 .5em;text-align: center;background-color: #f6f6f6;position: relative">
+        <span class="ico ico_search" style="z-index:2;position: absolute;left: 1.1em;top: 1em;"></span>
+        <input type="search" id="search_text" class="search_text form-control" placeholder="请输入关键字" onkeyup="searchSeries(event)">
+      </div>
+    </div>
+    <div class="main">
+      <div id="range"></div>
+      <div class="main" id="main_div"></div>
+      <div class="main" id="search_div"></div>
+    </div>
+    <div id="ABC">A</div>
+
+    <div class="child_view" id="series">
+      <div class="nav_top">
+        <div class="back_div" onclick="viewBack(this)">
+          <span class="ico nav_icon_back"></span>
+        </div>
+        <t>选择车型</t>
+      </div>
+      <div class="main" id="series_main">
+      </div>
+    </div>
+
+    <div class="child_view" id="car_type">
+      <div class="nav_top">
+        <div class="back_div" onclick="viewBack(this)">
+          <span class="ico nav_icon_back"></span>
+        </div>
+        <t>选择车款</t>
+      </div>
+      <div class="main">
+      </div>
+    </div>
+  </body>
+<script type="text/javascript">
+var car={};
+window.onload=function(){
+  getCarBrand();//获取车的品牌列表
+
+  E("range").addEvent("touchstart",letterS).addEvent("touchmove",letterM).addEvent("touchend",letterE);
+}
+function getCarBrand(){//获取汽车品牌
+  var url=_apiUrl_+"base/car_brand";
+  window.Bjson=ajaxSend("",url,"GET");
+  var F="";
+  var Fs="";
+  var img;
+  var body=E("main_div");
+  for(var i=0;i<Bjson.length;i++){
+    F=Bjson[i].t_spell;
+    Fs+="<t>"+F+"</t><br>";
+    var div=document.createElement("div");
+    div.innerHTML='<div class="T" id="'+Bjson[i].t_spell+'">'+Bjson[i].t_spell+'</div>';
+    for(var j=i;j<Bjson.length&&Bjson[j].t_spell==F;j++){
+      if(Bjson[j].url_icon)img=_imageUrl_+Bjson[j].url_icon;
+      else img="img/icon_car_moren.png";
+      div.innerHTML+='<div class="car" id="'+Bjson[j].id+'" onclick="chooseT(this)"><img src="'+img+'">'+Bjson[j].name+'</div>';
+    }
+    body.appendChild(div);
+    i=j-1;
+  }
+  E("range").innerHTML=Fs;
+}
+
+function chooseT(h){//选择该品牌，获取该品牌车型，或者该车型下的车款
+  var Tid=$(h).parents(".main").attr("id");//判断是选择车型还是车款
+  var id=h.id;
+  var name=d_trim(h.innerText);
+  var aUrl="";
+  if(Tid!="series_main"){
+    aUrl=_apiUrl_+"base/car_series?pid="+id;
+    car.brandId=id;
+    car.brand=name;
+  }else{
+    aUrl=_apiUrl_+"base/car_type?pid="+id;
+    car.series=name;
+    car.seriesId=id;
+  }
+  
+  $.ajax({
+    url:aUrl,
+    type:"GET",
+    dataType:"json",
+    success: function(json){
+      if(json.status_code){
+        statusCode(json.status_code);
+        if(json.err_msg){
+          alert("发生错误："+json.err_msg+"；错误码:"+json.status_code);
+        }
+      }else{
+        var Did,html="";
+        if(!json.length){
+          car.typeId=car.seriesId;
+          car.type=car.series;
+          window.parent.resultCar(car);
+          return;
+        }
+        if(Tid!="series_main"){
+          Did="series";
+          for (var i=json.length-1;i>=0;i--) {
+            html+="<div class='car' onclick='chooseT(this)' id='"+json[i].id+"'>"+json[i].show_name+"</div>";
+          };
+        }else{
+          Did="car_type";
+          for (var i=json.length-1;i>=0;i--) {
+            html+="<div class='car' onclick='chooseType(this)' id='"+json[i].id+"'>"+json[i].go_name+" "+json[i].name+"</div>";
+          };
+        }
+        C("#"+Did+" .main").innerHTML=html;
+        C("#"+Did+">.nav_top>t").innerText=name;
+        E(Did).style.display="block";
+      }
+    }
+  })
+}
+function chooseType(h){//选择完车款返回给父页面，调用父页面的resultCar方法
+  var id=h.id;
+  var name=d_trim(h.innerText);
+  car.typeId=id;
+  car.type=name;
+  window.parent.resultCar(car);
+}
+
+function letterS(){
+  window.range=E("range");
+  window.h=range.clientHeight;//侧边栏的高度
+  window.l=range.childNodes.length/2;//侧边栏内的字母数
+  //var Sh=window.clientHeight;//屏幕高度
+  letterM();
+  E("ABC").style.display="block";
+}
+function letterM(){
+  var Th=event.changedTouches[0].clientY-100;//触点在侧边栏的y坐标
+  var n=parseInt(Th/h*l)*2;//计算出触点是在哪个字母上
+  var A=range.childNodes[n].innerText;
+  E("ABC").innerText=A;
+  self.location='#'+A;
+}
+function letterE(){
+  window.l=window.h=window.range=null
+  E("ABC").style.display="none";
+}
+
+function searchSeries(){
+  //搜索
+  var str=d_trim(E("search_text").value);
+  if(str==""||!str){
+    E('search_div').style.display='none';
+    return;
+  }
+  var exp=new RegExp(str,"i");
+  var tempHtml=""
+  for (var i = Bjson.length - 1; i >= 0; i--) {
+    if(Bjson[i].name.search(exp)!=-1){
+      tempHtml+=E(Bjson[i].id).outerHTML;
+    }
+  };
+  var search_div=E("search_div");
+  search_div.innerHTML=tempHtml;
+  search_div.style.display="block";
+}
+</script>
+<style type="text/css">
+  #search_div{position: absolute;z-index: 3;top: 0;background-color: #fff;display: none}
+  #ABC{position: fixed;top: 40%;left: 42.5vw;font-size: 15vw;width: 1.2em;background-color: rgba(0,0,0,.7);color: #fff;height: 1.2em;text-align: center;line-height: 1.2em;border-radius: .2em;display: none}
+  #range{position: absolute;z-index: 2;width: 1.5em;height: 100%;right: 0;text-align: center;display: flex;flex-direction: column;}
+  #range>t{flex:1;}
+  .main{position: relative;width: 100%;height: 100%;overflow-y: auto;}
+  #first_letter{display: none}
+  .search_text{width: 100%;padding-left: 2.2em;}
+  body{background-color: #efefef;}
+  .T{background-color: #D1EAF9;padding: .3em .8em;}
+  .car{padding: .3em .8em;border-bottom: 1px solid #ccc;background-color: #fff;line-height: 2em;}
+  .car img{width: 2em;height: 2em;margin-right: 1em;vertical-align: bottom;}
+</style>
+</html>

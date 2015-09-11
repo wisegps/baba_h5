@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>我的账户</title>
+
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/jQuery.md5.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+    <script type="text/javascript" src="js/user_detail.js"></script>
+</head>
+<style type="text/css">
+	.main>div{background-color: #fff;padding: 0em 1.7em 0em .5em;border-bottom: 1px solid #ddd;position: relative;line-height: 2.7em}
+	.icoDiv{position: absolute;right: .5em;top: 0;}
+	label+span{float: right;}
+	.btn_right{position: relative;top: -0.1em;}
+	.icon img{width: 3em;height: 3em;border-radius: 1.5em;margin: .5em 0;float: right;}
+	.icon>div{height: 100%;float: right;width: 3em;position: relative;}
+	.main>.icon{height: 4em;line-height: 4em;}
+	.child_view>.main{padding:1em .5em}
+	p{margin: 0;text-align: center;}
+	.form-control{margin-top: .8em;color: #239AE4}
+	.no_title:before{content: ""}
+	.alert>div>div{padding: .5em 1em}
+	.alert{display: none;z-index: 1032;}
+	.alert_suer>div{display: inline-block;width: 50%;}
+	[type=file]{position: absolute;opacity: 0;width: 100%;height: 100%;}
+	.uploading{-webkit-animation: rotate 2s;-webkit-animation-iteration-count:infinite;-webkit-animation-timing-function:linear;}
+</style>
+<body>
+	<div class="nav_top">
+		<div class="back_div" onclick="history.back()">
+			<span class="ico nav_icon_back"></span>
+		</div>
+		我的账户
+	</div>
+
+	<div class="main">
+		<div class="icon">
+			头像
+			<div>
+				<img src="" id="logo">
+				<input type="file" name="image" accept="image/*" onchange="fileUpload(this)">
+			</div>
+		</div>
+		<div onclick="changeMobile(0)">
+			<label>手机</label>
+			<span id="mobile"></span>
+		</div>
+		<div onclick="callView('name_view')">
+			<label>昵称</label>
+			<span id="name"></span>
+			<div class="icoDiv">
+	        	<span class="ico btn_right"></span>
+	        </div>
+		</div>
+		<div onclick="changeMobile(1)">
+			<label>邮箱</label>
+			<span id="email"></span>
+			<div class="icoDiv">
+	        	<span class="ico btn_right"></span>
+	        </div>
+		</div>
+		<div onclick="$('.sex').show()">
+			<label>性别</label>
+			<span id="sex">男</span>
+			<div class="icoDiv">
+	        	<span class="ico btn_right"></span>
+	        </div>
+		</div>
+		<div style="border: none;" onclick="$('.birthday').show()">
+			<label>生日</label>
+			<span id="birthday"></span>
+			<div class="icoDiv">
+	        	<span class="ico btn_right"></span>
+	        </div>
+		</div>
+
+		<div style="border: none;margin-top:1em" onclick="callView('pwd_view')">
+			<label>修改密码</label>
+			<div class="icoDiv">
+	        	<span class="ico btn_right"></span>
+	        </div>
+		</div>
+	</div>
+
+	<div class="child_view" id="mobile_view">
+		<div class="nav_top">
+		    <div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+		    <span>修改手机<span>
+	    </div>
+	    <div class="main">
+	    	<input type="text" class="form-control" placeholder="请输入手机号" name="mobile">
+      		<input type="submit" onclick="sendCode()" class="form-control" value="下一步">
+	    </div>
+	</div>
+
+	<div class="child_view" id="code_view">
+		<div class="nav_top">
+		    <div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+		    填写验证码
+	    </div>
+	    <div class="main">
+	    	<p>我们已经发送验证码到以下<span>号码</span><br><span></span></p>
+	    	<input type="text" class="form-control" placeholder="请输入验证码" name="code">
+	    	<input type="password" class="form-control" placeholder="请输入登录密码" name="pwd">
+      		<input type="submit" onclick="checkCode()" class="form-control" value="修改">
+	    </div>
+	</div>
+
+	<div class="child_view" id="name_view">
+		<div class="nav_top">
+		    <div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+		    <span>修改昵称<span>
+	    </div>
+	    <div class="main">
+	    	<input type="text" class="form-control" placeholder="请输入手机号" name="name" style="text-align: center;">
+      		<input type="submit" onclick="changeName()" class="form-control" value="确定">
+	    </div>
+	</div>
+
+	<div class="alert sex">
+		<div>
+			<div class="alert_title no_title">请选择性别</div>
+			<div class="alert_content" style="padding: 0;">
+				<div style="border-bottom: 1px solid #ddd;padding: .5em 1em;" onclick="changeSex(0)">男</div>
+				<div style="padding: .5em 1em;" onclick="changeSex(1)">女</div>
+			</div>
+			<div class="alert_suer no_title" onclick="$('.sex').hide()">取消</div>
+		</div>
+	</div>
+
+	<div class="alert birthday">
+		<div>
+			<div class="alert_title no_title">请输入生日</div>
+			<div class="alert_content">
+				<input type="text" class="form-control" style="margin: 0;" name="birthday" onkeyup="checkDate(this)">
+			</div>
+			<div class="alert_suer no_title"><div style="border-right: 1px solid #aaa;" class="no_title" onclick="$('.birthday').hide()">取消</div><div class="no_title" onclick="changeBirthday()">确定</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="child_view" id="pwd_view">
+		<div class="nav_top">
+		    <div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+		    <span>修改密码<span>
+	    </div>
+	    <div class="main">
+	    	<input type="password" class="form-control" placeholder="请输入旧密码" name="old_pwd">
+	    	<input type="password" class="form-control" placeholder="请输入新密码" name="new_pwd">
+	    	<input type="password" class="form-control" placeholder="重复新密码" name="new_pwd2">
+      		<input type="submit" onclick="changePwd()" class="form-control" value="确定">
+	    </div>
+	</div>
+</body>
+</html>

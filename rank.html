@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>排行榜界面</title>
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+  </head>
+<style>
+  body{background: #fff;color:#082D57;padding-bottom: 0}
+  #main_body{}
+  #main_body>div{padding:10px}
+  .car_nav>div{color:#14C79E;width: 50%}
+  .car_nav>.active{background: #14C79E;color: #fff;}
+  #main_body>#rank{font-size: .95em;padding-top: 0}
+  .ranking{border-bottom: 1px solid #ccc;position: relative;}
+  .ranking>div{display:inline-block}
+  .logo{padding: .5em;}
+  .logo>img{width: 3em;border-radius: 50%;}
+  .content{padding: .5em;line-height: 1.5em;}
+  .b{width: 1.5em;height: 1.5em;border-radius: 50%;background-color: #FFCB00;text-align: center;color: #fff;position: absolute;top: .2em;right: 0;}
+</style>
+<body>
+  <div class="nav_top">
+    <div style="padding-left:1.2em;position: absolute;" onclick="window.parent.viewBack('rank')">
+      <span class="ico nav_icon_back"></span>
+    </div><t id="car_name">油耗排行榜</t></div>
+
+  <div id="main_body">
+    <div id="nav">
+      <div class="car_nav" style="line-height: 40px;border: 1px solid #14C79E;border-radius: 5px;">
+        <div id="month" class="active" onclick="changeView(this)">
+          <h3>月排行</h3>
+        </div><div id="all" style="border-color:#14C79E" onclick="changeView(this)">
+          <h3>总排行</h3>
+        </div>
+      </div>
+    </div>
+    <div id="rank">
+    </div>
+  </div>
+</body>
+<script type="text/javascript">
+  var rank="fuel_rank";
+
+  window.onload=function(){
+    var r=getHttp().rank;
+    if(r)rank=r;
+
+    if(rank=="fuel_rank")E("car_name").innerText="油耗排行榜";
+    else E("car_name").innerText="驾驶排行榜";
+
+    getDataAndShow("month");
+  }
+
+  function getDataAndShow(type){
+    $.ajax({
+        url:_apiUrl_+"device/"+rank+"/"+type,
+        data:{
+          auth_code: _authCode_,
+        },
+        type:"GET",
+        dataType:"json",
+        async: true,
+        timeout: 10000,
+        success: function(json){
+          if(json.status_code){
+            statusCode(json.status_code);
+            return;
+          }
+          showData(json);
+        }
+      })
+  }
+
+  function showData(json){
+    if(rank=="fuel_rank")
+      var html='<div class="ranking" id="cust_id"><div class="logo"><img src="logo_src" name="logo"></div><div class="content">rank_numcust_name<br>里程total_distancekm 油耗avg_fuelL/100km<br>car_series（est_fuelL/100km）</div></div>';
+    else 
+      var html='<div class="ranking" id="cust_id"><div class="logo"><img src="logo_src" name="logo"></div><div class="content">rank_numcust_name<br>里程total_distancekm 平均得分：drive_score<br>car_series（est_fuelL/100km）</div></div>';
+      var rank=$("#rank");
+      rank.empty();
+      var taget,src,b;
+    for(var i=0;i<json.length;i++){
+      taget=html;
+      if(!json[i].logo||json[i].logo=="(null)")src="img/icon_people_no.png";
+      else src=json[i].logo;
+      taget=taget.replace("logo_src",src);
+      taget=taget.replace("cust_name",json[i].cust_name);
+      taget=taget.replace("total_distance",json[i].total_distance);
+      taget=taget.replace("avg_fuel",json[i].avg_fuel);
+      taget=taget.replace("est_fuel",json[i].est_fuel);
+      //taget=taget.replace("car_brand",json[i].car_brand);
+      taget=taget.replace("car_series",json[i].car_series);
+      taget=taget.replace("drive_score",parseInt(json[i].drive_score));
+
+      if(i<3){
+        b='<div class="b">'+(i+1)+'</div>';
+      }else b="";
+      taget=taget.replace("rank_num",b);
+
+      taget=taget.replace("cust_id",json[i].cust_id);
+      rank.append(taget);
+    }
+  }
+
+  function changeView(h){
+    var id=$(h).attr("id");
+    $(h).addClass("active").siblings().removeClass("active");
+    getDataAndShow(id);
+  }
+</script>
+</html>

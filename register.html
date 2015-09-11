@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>验收验证码界面</title>
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/jQuery.md5.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+    <script type="text/javascript" src="js/register.js"></script>
+  </head>
+  <body>
+  <div class="nav_top">填写验证码</div>
+  <div id="register" class="child_view">
+    <div class="nav_top">
+      <div class="back_div" onclick="history.back()">
+        <span class="ico nav_icon_back"></span>
+      </div>
+      填写验证码
+    </div>
+    <div style="padding:1em .5em">
+      <p>我们已经发送验证码到以下账号：<br><t id="account"></t></p>
+      <input type="text" name="valid_code" class="form-control" placeholder="请输入验证码">
+      <input type="password" name="pwd" class="form-control" placeholder="请输入登录密码">
+      <input type="password" name="repeat_pwd" class="form-control" placeholder="请再次输入登录密码">
+      <input type="submit" onclick="checkCode()" class="form-control" value="下一步" style="color:#fff;background:#1BADED;margin-top:1.5em">
+    </div>
+  </div>
+  <div id="SMS" class="child_view no_pad" style="display:block">
+    <iframe src="SMS_verification.html"></iframe>
+  </div>
+
+  <div id="info" class="child_view">
+    <div class="nav_top">
+      <div class="back_div" onclick="viewBack(this)">
+        <span class="ico nav_icon_back"></span>
+      </div>
+      最后一步
+    </div>
+    <p style="margin: .5em;">您的注册马上就要成功了，请输入以下基本信息</p>
+    <div style="padding:1em .5em;">
+      <table style="width: 100%;">
+        <tr>
+          <td>昵称：</td>
+          <td>
+            <input type="text" name="cust_name" class="form-control" placeholder="请输入昵称" onblur="checkName()">
+          </td>
+        </tr>
+        <tr>
+          <td>出生年份：</td>
+          <td>
+            <select name="year" class="form-control">
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>性别：</td>
+          <td>
+            <input type="radio" name="sex" value="0" checked="true">男
+            <input type="radio" name="sex" value="1">女
+          </td>
+        </tr>
+        <tr>
+          <td>身份：</td>
+          <td>
+            <input type="radio" name="cust_type" value="0" onclick="hideAll()">无车
+            <input type="radio" name="cust_type" value="1" checked="true" onclick="showCar()">车主
+            <input type="radio" name="cust_type" value="2" onclick="showService()">服务商
+          </td>
+        </tr>
+        <tr id="car_series">
+          <td>车型</td>
+          <td>
+            <input type="text" name="car_series" class="form-control" placeholder="点击选择车型" onfocus="selectCar()">
+          </td>
+        </tr>
+        <tr id="service_type" style="display:none">
+          <td>类型</td>
+          <td>
+            <select name="service_type" class="form-control">
+            <option>销售</option>
+            <option>售后</option>
+            <option>保险</option>
+            <option>理赔</option>
+            <option>代办</option>
+            <option>维修</option>
+            <option>保养</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+      <input type="submit" onclick="submitInfo()" class="form-control" value="进入系统" style="color:#fff;background:#1BADED">
+    </div>
+
+    <div class="child_view no_pad" id="carSeries">
+      <iframe src="car_series.html"></iframe>
+    </div>
+  </div>
+  <style>
+  body{height: 100vh;}
+  p{text-align: center;line-height: 1.8em;margin-top: 0;}
+  form a{text-decoration:none;color: #123;margin-top: .5em}
+  .form-control{margin: 0 0 .5em 0;}
+  #mainCard{margin: 0;padding: 1.5em .3em;height: 100%;}
+  [type=radio]{margin-left: .5em;width: 1.2em;height: 1.2em;}
+  table .form-control{margin: 0}
+  td{padding: .2em .5em;text-align: left;}
+  </style>
+  </body>
+</html>

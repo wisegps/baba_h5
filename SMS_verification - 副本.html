@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>短信验证页面</title><!--仅供调用，直接访问无功能-->
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+</head>
+<style type="text/css">
+	.main{padding: .5em}
+	input{margin-top: 2em}
+	.blue_but{margin-top: 1em}
+	body{background-color: #eee}
+	p{text-align: center;}
+</style>
+<body>
+	<div class="nav_top">
+		<div class="back_div" onclick="iframeViewBack('SMS')">
+	        <span class="ico nav_icon_back"></span>
+	    </div>
+		<span id="title">绑定终端</span>
+	</div>
+	<div id="main_div" class="main">
+		<input class="form-control" disabled="disabled" id="account" placeholder="请输入您注册的邮箱或手机">
+		<button class="form-control blue_but" onclick="checkSMS()">验证身份</button>
+	</div>
+
+	<div class="child_view" id="check_SMS">
+		<div class="nav_top">
+			<div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+			填写验证码
+		</div>
+		<div class="main">
+			<p>我们已经发送验证码到以下号码<br></p>
+			<input class="form-control" placeholder="请输入验证码" style="margin-top: 1em;" id="valid_code">
+			<form id="form2">
+				<input type="password" class="form-control" placeholder="请输入新密码" style="margin-top: 1em;" name="pwd">
+				<input type="password" class="form-control" placeholder="请重复新密码" style="margin-top: 1em;" name="repeat_pwd">
+			</form>
+			<button class="form-control blue_but" onclick="checkValidCode()" id="title_but">忘记密码</button>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var validCode,activity;//验证码，父页面调用的业务代码
+	var account=LS("userName");
+	if(account)
+		E("account").value=account;
+	var type=2;
+	
+	function checkSMS(){
+		account=d_trim(E("account").value);
+		account="15622106145";
+		if(!account||account==""){
+			alert("请输入您注册的邮箱或手机");
+			return;
+		}
+		if(account.length==11&&!isNaN(account)){
+			type=0;
+		}else if(isEmail(account)){
+			type=1;
+		}
+		var t=["手机号码","邮箱"];
+		if(type==2){
+			alert("账号格式不正确");
+			return;
+		}
+		myConfirm("我们将发送验证码到您的"+t[type]+"："+account+"，请尽快查收",function(b){
+			if(!b)return;
+
+			sendSMS();
+			callView('check_SMS');
+		});
+	}
+
+	function sendSMS(){//请求发送短信
+		if(type==2){
+			alert("账号格式不正确");
+			return;
+		}
+		if (type){
+			url =_apiUrl_+"valid_code/email?email="+account+"&type=1";
+		}else{
+			url =_apiUrl_+"valid_code?mobile="+account+"&type=1";
+		}
+		$.ajax({//发送注册账号给服务器
+			url:url,
+			type:"GET",
+			dataType:"json",
+			success: function(json){
+				//处理返回结果
+				if(json.status_code){
+					statusCode(json.status_code);
+					if(json.err_msg){
+						alert("发生错误："+json.err_msg+",点击确定返回登录页面重新登录；错误码:"+json.status_code,
+						function(){self.location='index.html'});
+					}
+				}else if(json.valid_code){
+					//发送验证码成功
+					validCode=json.valid_code;
+				}
+			}
+		})
+	}
+
+	function checkValidCode(){
+		//验证验证码
+		var code=E("valid_code").value;
+		if(code!=validCode){
+			alert("验证码错误");
+			return;
+		}
+		
+		if(activity==2)
+			window.parent.iframeSuccess(activity,account);
+		else
+			window.parent.iframeSuccess(activity);
+		iframeViewBack('SMS');
+	}
+
+	function preset(code){
+		//预设值
+		activity=code;
+		var a=E("account");
+		var tb=E("title_but");
+		var t=E("title");
+		a.setAttribute("disabled","disabled");
+		switch(code){
+			case 0:
+				tb.innerText="解除绑定";
+				t.innerText="解除绑定";
+				break;
+			case 1:
+				tb.innerText="修改终端";
+				t.innerText="修改终端";
+				break;
+			case 2:
+				tb.innerText="重置密码";
+				t.innerText="忘记密码";
+				a.value=null;
+				a.removeAttribute("disabled");
+				break;
+		}
+	}
+</script>
+</html>

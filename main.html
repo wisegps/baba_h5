@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head> 
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#BF3030">
+  
+  <title>主界面</title>
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <link rel="stylesheet" type="text/css" href="css/main_page.css">
+  <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=DjMyWnXm12o3esdcWR8gIQLm"></script>
+  <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+  <script type="text/javascript" src="js/Chart.js"></script>
+  <script type="text/javascript" src="js/public.js"></script>
+  <script type="text/javascript" src="js/main.js"></script>
+</head>
+<body>
+  <div class="nav_top" id="nav_top">
+    叭叭
+    <div style="right:1.2em;position: absolute;top:0;">
+      <a href="more.html"><span class="ico set"></span></a>
+    </div>
+  </div>
+  <div class="card" id="mainCard" data-id="air">
+    <div class="card_nav">
+      <span name="car_name">WiCARE Air</span>
+      <span class="ico r1_c2"></span>
+      <span class="ico ico_down" onclick="callM(this)"></span>
+    </div>
+    <div class="card_body">
+      <h4 class="title_h4"><span class="mode_text auto"></span><span class="speed" data-speed="3"></span></h4>
+      <div class="circle">
+        <img src="img/circle_dial_color.png">
+        <img src="img/circle_cursor.png" class="circle_turn">
+
+        <div class="circle_content">
+          <h1 class="txt_air_score">100</h1>
+          <h3 class="air_text">车内空气优</h3>
+          <!--<h3 id="">滤芯还剩98%</h3>-->
+        </div>
+      </div>
+    </div>
+    <div class="out_side">
+      <span class="out_score">495</span>
+      <span class="out_t">室外污染严重</span><br>
+      <span class="out_add">武汉市青山区</span>
+    </div>
+    <div class="set_but">
+      <div class="switch" style="margin-left: 2%;">
+        <img src="img/1_r5_c1.png">
+      </div><div class="mode" data-mode="1">
+        <img src="img/1_r3_c5.png">
+      </div><div onclick="goTo('setting')">
+        <img src="img/1_r5_c11.png">
+      </div><div class="speed_but">
+        <img src="img/1_r5_c13.png">
+      </div>
+    </div>
+
+    <div class="day_line">
+      <span class="ico ico_down" onclick="showLine()"></span>
+      <h3>车内空气质量指数 1小时趋势图</h3>
+      <div class="svg_div">
+        <div style="border-left-color: #870009;">
+          <span></span>
+          <span>重度污染</span>
+        </div>
+        <div style="border-left-color: #FC3D1C;">
+          <span>2300</span>
+          <span>中度污染</span>
+        </div>
+        <div style="border-left-color: #FFA532;">
+          <span>2000</span>
+          <span>轻度污染</span>
+        </div>
+        <div style="border-left-color: #BFCF12;">
+          <span>1500</span>
+          <span>良</span>
+        </div>
+        <div style="border-left-color: #36CE53;">
+          <span>1300</span>
+          <span>优</span>
+        </div>
+        <canvas id="line"></canvas>
+      </div>
+      <div class="line_x">
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-id="map">
+    <div class="card_nav" style="border:none">
+      <span name="car_name">车辆位置</span>
+      <span class="ico ico_nav_trip"></span>
+      <span class="ico ico_down" onclick="callM(this)"></span>
+    </div>
+    <div name="map">
+      <div id="allmap" style="height:100%"></div>
+      <nav>
+        <div onclick="findMyCar()">
+          <h4 style="border:none">寻车</h4>
+        </div><div onclick="goTo('drive_travel')">
+          <h4>行程</h4>
+        </div><div onclick="localSearch()">
+          <h4>周边</h4>
+        </div><div onclick="setFence()">
+          <h4>围栏</h4>
+        </div>
+      </nav>
+      <div class='meun'>
+        <div class='meun_but'><a href="service.html?wd=加油站">加油站</a></div>
+        <div class='meun_but'><a href="service.html?wd=停车场">停车场</a></div>
+        <div class='meun_but'><a href="service.html?wd=4S店">4S店</a></div>
+        <div class='meun_but'><a href="service.html?wd=专修店">专修店</a></div>
+        <div class='meun_but'><a href="service.html?wd=汽车美容">汽车美容店</a></div>
+        <div class='meun_but'><a href="service.html?wd=洗车">洗车店</a></div>
+      </div>
+      <div class='meun' id="set_fence" style="padding:.5em;line-height:1.8em">
+        <div>
+          报警类型：&nbsp; 
+          &nbsp;<input type="checkbox" name="in" id="alarm_in"><label for="alarm_in">进入报警</label> 
+          &nbsp;<input type="checkbox" name="out" id="alarm_out" checked="true"><label for="alarm_out">驶出报警</label> 
+        </div>
+        <div>
+          围栏范围： <input type="range" min="1" max="10" value="1" style="vertical-align: sub;margin:0 1em" id="fence" onchange="addFence()">
+          <t id="fenN">1</t>km
+        </div>
+        <div>
+          <div class="meun_but" onclick="saveFence()">设置围栏</div>
+          <div class="meun_but" onclick="removeFence()">删除围栏</div>
+        </div>
+      </div>
+    </div>
+    <div class="set_v">
+      <div class="set">
+        <ul>
+          <li style="padding-bottom: 3em;">设置震动灵敏度<br>
+            <input type="range" name="" min="0" max="9" value="1" style="vertical-align: sub;margin:0 1em" id="vibrate" onchange="vibrateChange()"><t id="vibrate_val">1</t>
+            <div class="meun_but" onclick="saveVibrate()" style="float: right;">确定</div>
+          </li>
+          <li onclick="collectAdress()">常用地址</li>
+          <li style="text-align: center;font-size: .9em;" onclick="$('.set_v').fadeOut(300)">取消</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="collect_adress">
+      <div class="nav_top">
+        常用地址
+        <div style="padding-left:1.2em;position: absolute;top:0" onclick="$('#collect_adress').hide();$('.set_v').hide();">
+          <span class="ico nav_icon_back"></span>
+        </div>
+        <div style="right:1.2em;position: absolute;top:0" onclick="addAddress()">
+          添加
+        </div>
+      </div>
+
+      <div class="addDiv" onclick="chooseAdd(this)" data-i="0">
+        <span name="addName">家</span><br>
+        <div class="addIco">
+          <span class="ico body_icon_lbs_l" onclick="navigationTo(this)"></span>
+          <span class="ico map_delete" onclick="deleteAdd(this)"></span>
+        </div>
+      </div>
+      <div class="addDiv" onclick="chooseAdd(this)" data-i="1">
+        <span name="addName">公司</span><br>
+        <div class="addIco">
+          <span class="ico body_icon_lbs_l" onclick="navigationTo(this)"></span>
+          <span class="ico map_delete" onclick="deleteAdd(this)"></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="choose_add">
+      <div class="nav_top" style="">
+        <div class="back_div" onclick="$('#choose_add').hide()">
+            <span class="ico nav_icon_back"></span>
+        </div>
+        <div onclick="" style="padding-left: 3em;">
+          <span class="ico ico_search" style="z-index:2;position: relative;"></span>
+          <input type="search" id="search_text" class="search_text" placeholder="输入名称或地址" onkeyup="searchAdd(event)">
+        </div>
+      </div>
+      <div id="choose_way">
+        <div style="">
+          <span style="width: 50%;display: inline-block;text-align: center;border-right:1px solid #ccc" onclick="mapChoose()">地图选点</span><span style="width: 50%;display: inline-block;text-align: center;">收藏选点</span>
+        </div>
+        <div id="myPoint" onclick="chooseThis(this)">
+          <span class="ico ico_search" style="z-index:2;position: relative;"></span>
+          我的位置
+        </div>
+      </div>
+      <div id="search_result">
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-id="car" style="position: relative;">
+    <span class="ico ico_down" onclick="callM(this)" style="position: absolute;right: 5px;"></span>
+    <div style="width:100%;overflow: hidden;" id="car_view_p">
+      <div class="car_view" id="car_view">
+        <div class="car" id="car_id" style="width:_repace_width%;">
+          <div class="card_nav">
+            <span name="car_name">nick_name</span><img src="img/ico_location_off.png" class="nav_img">
+            <h4 name="address" onclick="inToMap()">车辆地址信息</h4>
+          </div>
+          <div class="card_body">
+            <div class="card_head">
+              <h4>SIM:<t name="remain_traffic">20</t>M/<t name="total_traffic">30</t>M</h4>
+              <div name="stealth_mode" class="main_but status" onclick="stealthMode(this)" style="float:right;font-size: .8em;display: inline;"></div>
+              <span name="signal_level" class="ico ico_wifi_0"></span>
+              <span name="device_flag" class="ico ico_state_0"></span>
+            </div>
+            <div>
+              <div class="circle w_50" name="health" onclick="goTo('health')">
+                
+                  <img src="img/circle_dial_color.png">
+                  <div class="shan">
+                    <div name="1"></div>
+                    <div name="2"></div>
+                    <div name="0"></div>
+                    <div name="3"></div>
+                  </div>
+                
+                <img src="img/circle_cursor.png" class="circle_turn" style="animation-play-state:paused;-webkit-animation-play-state:paused;">
+                <img src="img/circle_cover.png">
+                <div class="circle_content">
+                <h4>健康指数</h4>
+                <h2><t name="score">0</t><small>分</small></h2>
+                </div>
+              </div>
+              <div class="circle w_50" name="drive" onclick="goTo('drive')">
+                <img src="img/circle_dial_color.png">
+                <div class="shan">
+                  <div name="1"></div>
+                  <div name="2"></div>
+                  <div name="0"></div>
+                  <div name="3"></div>
+                </div>
+                <img src="img/circle_cursor.png" class="circle_turn" style="animation-play-state:paused;-webkit-animation-play-state:paused;">
+                <img src="img/circle_cover.png">
+                <div class="circle_content">
+                <h4>驾驶指数</h4>
+                <h2><t name="score">0</t><small>分</small></h2>
+                </div>
+              </div>
+            </div>
+            <div class="car_nav">
+              <div onclick="goTo('distance')">
+                <h3><t name="distance">000</t><small>km</small></h3>
+                <h5>
+                  <span class="ico ico_drive_distance"></span>
+                  本月里程
+                </h5>
+              </div><div onclick="goTo('fuel')">
+                <h3><t name="fuel">00.0</t><small>L</small></h3>
+                <h5>
+                  <span class="ico ico_drive_gas_avg"></span>
+                  本月油耗
+                </h5>
+              </div><div onclick="goTo('fee')">
+                <h3><small>￥</small><t name="fee">000</t></h3>
+                <h5>
+                  <span class="ico ico_cost"></span>
+                  本月花费
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!--多辆车-->
+    </div>
+  </div>
+
+  <div class="child_view" id="card_manage" onclick="viewBack('card_manage')">
+    <div>
+      <div onclick="toTop()">置顶</div>
+      <div onclick="delCard()">删除</div>
+    </div>
+  </div>
+</body>
+</html>

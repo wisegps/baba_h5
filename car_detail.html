@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>车辆信息</title>
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+</head>
+<style type="text/css">
+	body{padding-bottom: 50px;}
+	.infobox{border: 1px solid #ccc;border-radius: 4px;padding: .5em .5em 0 .5em;background-color: #fff;margin: .5em;line-height: 40px;}
+	.infobox>div{border-bottom: 1px solid #ccc;padding-right: .5em;}
+	.infobox>div:last-of-type{border: none}
+	.infobox label+*,input{border:none;height: 40px;padding: 6px 12px;font-size: 16px;color: #555;background-color: #fff;border-radius: 4px;display: inline-block;}
+	.infobox label{width: 6em;text-align: right;}
+	.infobox label+*:focus,input:focus{outline: none}
+	#car_tip_certificate,#car_tip_certificate_1{display: none;}
+	[src*='car_tip_certificate']{display: none;position: fixed;width: 80%;left: 10%;top: 10%;-webkit-animation: fromSmall .2s;}
+	#car_tip_certificate:checked+label>img{display: block;}
+	nav h4{font-size: 1em;border-right: 1px solid #ccc;padding: 0;width: 33.3333%}
+	h4:last-child{border-right: none}
+	nav{padding: 5px}
+	nav>div:last-of-type>h4{border: none}
+	#insurance_list>div,#maintain_list>div{line-height: 2.2em;padding: 0 .5em;border-bottom: 1px solid #ccc;color: #123;font-size: 1.1em;}
+	#insurance_list>div>small{margin-left: .5em;color: #999}
+	#city_list,#province_list{overflow-y: auto;display: inline-block;width: 50%;height: 100%}
+	#city_list>option,#province_list>option{line-height: 2em;padding: 0 1em;border-bottom: 1px solid #ccc;}
+	#vio_citys>.main{overflow: hidden;}
+	#citys{line-height: 2em;padding: 0 1em;display: none;border-bottom: 1px solid #ccc;height: 2em}
+	#citys>label{margin-right: .5em}
+	option.active{background-color: #d6e9c6}
+	#citys.show{display: block;}
+	#citys.show+.main{padding-bottom: 2em}
+	.zuo_view{float: right;}
+</style>
+<body>
+	<div class="nav_top">
+		<div class="back_div" onclick="history.back()">
+	        <span class="ico nav_icon_back"></span>
+	    </div>
+		爱车信息
+		<div class="nav_ico_right">
+	    	<span class="ico nav_icon_ok_nor" onclick="save()"></span>
+	    </div>
+	</div>
+	<nav>
+		<h4 onclick="callSMS(this,0)">解除绑定</h4><h4 onclick="callSMS(this,1)">修改终端</h4><h4 onclick="askDelete()">删除车辆</h4></div>
+	</nav>
+	<div id="main_div">
+		<div class="infobox">
+			<div>
+				<label>车辆名称：</label>
+				<input name="nick_name">
+			</div>
+			<div>
+				<label>车牌号：</label>
+				<div style="position:relative;padding:0;height:auto;width: 60%;">
+					<span class="sxj" style="left:2em"></span>
+					<t id="province" style="position:absolute;left:.8em;top: 1px;" onclick="callView('choose_province')">粤</t>
+					<input name="obj_name" style="padding-left: 2.8em;">
+				</div>
+			</div>
+			<div onclick="callView('carSeries')">
+				<label>车型：</label>
+				<input name="car_series" class="notneed" disabled="disabled">
+				<div class="zuo_view"><span class="ico btn_jiantou_lvse_zuo"></span></div>
+			</div>
+			<div>
+				<label>汽油标号：</label>
+				<select name="gas_no" onchange="changeGas()">
+					<option>0#</option>
+					<option>90#</option>
+					<option selected="selected">93#(92#)</option>
+					<option>97#(95#)</option>
+				</select>
+			</div>
+			<div>
+				<label>加油油价：</label>
+				<input type="text" name="fuel_price">
+			</div>
+		</div>
+		<div class="infobox">
+			<div onclick="callCity()">
+				<label>违章城市：</label>
+				<input name="vio_city_name" class="notneed" disabled="disabled">
+				<div class="zuo_view"><span class="ico btn_jiantou_lvse_zuo"></span></div>
+			</div>
+			<div style="display:none;position: relative;">
+				<label>车架号：</label>
+				<input name="frame_no" placeholder="需要完整的车架号">
+				<div style="float: right;">
+					<div class="Q_ico all_center" style="left:auto;">
+						<label for="car_tip_certificate">？</label>
+						<input type="radio" name="car_tip_certificate" class="notneed" id="car_tip_certificate_1">
+						<input type="radio" name="car_tip_certificate" class="notneed" id="car_tip_certificate">
+						<label for="car_tip_certificate_1">
+							<img src="img/car_tip_certificate.png">
+						</label>
+					</div>
+				</div>
+			</div>
+			<div style="display:none;position: relative;">
+				<label>发动机号：</label>
+				<input name="engine_no" placeholder="需要完整的发动机号">
+				<div style="float: right;">
+					<div class="Q_ico all_center" style="left:auto;">
+						<label for="car_tip_certificate">？</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="infobox">
+			<div onclick="callView('insurance')">
+				<label>保险公司：</label>
+				<input name="insurance_company" disabled="disabled">
+				<div class="zuo_view"><span class="ico btn_jiantou_lvse_zuo"></span></div>
+			</div>
+			<div>
+				<label>联系电话：</label>
+				<input name="insurance_tel">
+			</div>
+			<div>
+				<label>保险时间：</label>
+				<input type="date" name="insurance_date">
+			</div>
+			<div>
+				<label>保单号：</label>
+				<input name="insurance_no">
+			</div>
+		</div>
+		<div class="infobox">
+			<div onclick="callMaintain()">
+				<label>购车4S店：</label>
+				<input name="maintain_company" disabled="disabled">
+				<div class="zuo_view"><span class="ico btn_jiantou_lvse_zuo"></span></div>
+			</div>
+			<div>
+				<label>联系电话：</label>
+				<input name="maintain_tel">
+			</div>
+			<div>
+				<label>购车时间：</label>
+				<input type="date" name="buy_date">
+			</div>
+			<div>
+				<label>年检时间：</label>
+				<input type="date" name="annual_inspect_date">
+			</div>
+		</div>
+	</div>
+
+	<div class="child_view" id="choose_province">
+		<div class="nav_top">
+			<div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+			请选择车辆地区
+		</div>
+		<table rules="all" frame="box">
+			<tr>
+				<td>京</td><td>津</td><td>沪</td><td>渝</td>
+			</tr>
+			<tr>
+				<td>冀</td><td>豫</td><td>云</td><td>辽</td>
+			</tr>
+			<tr>
+				<td>黑</td><td>湘</td><td>皖</td><td>鲁</td>
+			</tr>
+			<tr>
+				<td>新</td><td>苏</td><td>浙</td><td>赣</td>
+			</tr>
+			<tr>
+				<td>鄂</td><td>桂</td><td>甘</td><td>晋</td>
+			</tr>
+			<tr>
+				<td>蒙</td><td>陕</td><td>吉</td><td>闽</td>
+			</tr>
+			<tr>
+				<td>贵</td><td>粤</td><td>青</td><td>藏</td>
+			</tr>
+			<tr>
+				<td>川</td><td>宁</td><td>琼</td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="child_view" id="carSeries" style="padding:0">
+      <iframe src="car_series.html"></iframe>
+    </div>
+
+    <div class="child_view" id="insurance">
+      	<div class="nav_top">
+			<div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+			保险公司
+		</div>
+		<div id="insurance_list" class="main">
+			
+		</div>
+    </div>
+
+    <div class="child_view" id="maintain">
+      	<div class="nav_top">
+			<div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+			4S店
+		</div>
+		<div id="maintain_list" class="main"></div>
+    </div>
+
+    <div class="child_view" id="vio_citys">
+      	<div class="nav_top">
+			<div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+			违章城市
+		</div>
+		<div id="citys"></div>
+		<div class="main">
+			<div id="province_list">
+				<option value="京">北京</option>
+				<option value="沪">上海</option>
+				<option value="渝">重庆</option>
+				<option value="冀">河北</option>
+				<option value="晋">山西</option>
+				<option value="豫">河南</option>
+				<option value="辽">辽宁</option>
+				<option value="吉">吉林</option>
+				<option value="黑">黑龙江</option>
+				<option value="蒙">内蒙古</option>
+				<option value="苏">江苏</option>
+				<option value="鲁">山东</option>
+				<option value="皖">安徽</option>
+				<option value="浙">浙江</option>
+				<option value="闽">福建</option>
+				<option value="鄂">湖北</option>
+				<option value="湘">湖南</option>
+				<option value="粤">广东</option>
+				<option value="赣">江西</option>
+				<option value="川">四川</option>
+				<option value="琼">海南</option>
+				<option value="贵">贵州</option>
+				<option value="云">云南</option>
+				<option value="藏">西藏</option>
+				<option value="陕">陕西</option>
+				<option value="甘">甘肃</option>
+				<option value="青">青海</option>
+				<option value="宁">宁夏</option>
+				<option value="新">新疆</option>
+			</div><div id="city_list"></div>
+		</div>
+    </div>
+
+    <div class="child_view no_pad" id="SMS">
+		<iframe src="SMS_verification.html"></iframe>
+	</div>
+
+	<div class="child_view no_pad" id="add_device">
+		<iframe src="add_device.html"></iframe>
+	</div>
+</body>
+<script type="text/javascript" src="js/car_detail.js"></script>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>更多</title>
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+    <script type="text/javascript" src="js/more.js"></script>
+  </head>
+  <style>
+  .group{margin: 10px 0;background-color: #fff;}
+  .group>a{text-decoration: none;color: #092D4C;}
+  .group>a>div,.group>div{padding: 0 1em;line-height: 3.5em;}
+  .icoDiv{float: right;}
+  #logout{line-height: 3em;color: #fff;text-align: center;background-color: #ED766C;position: fixed;width: 100%;bottom: 0;}
+  #my_favorite>.main{position: relative;overflow-y: auto;padding-top: 10px;}
+  [name='shop']>.name{position: relative;padding: 0}
+  .del{position: absolute;right: 0;top: 0;background-color: #F56D77;width: 4em;text-align: center;color: #fff;}
+  .name_t{transform: translate3d(0,0,0);-webkit-transition: -webkit-transform .3s;background-color: #F2F8FD;padding:0 .5em;z-index: 2;position: relative;}
+  .name_t.show_q{transform: translate3d(-4em,0,0);}
+  .group .user_inof{line-height: 0em;display: table;width: 100%;padding: .5em 1em;}
+  .user_inof>div{line-height: 1em;display: table-cell;vertical-align: middle;}
+  .icon>img{width: 3.5em;height: 3.5em;border-radius: 1.75em;}
+  .code{text-align: right;}
+  .icon_man{margin: .5em}
+  </style>
+  <body>
+  <div class="nav_top">
+    <div class="back_div" onclick="history.back()">
+      <span class="ico nav_icon_back"></span>
+    </div>
+    更多
+  </div>
+  <div class="group">
+    <a href="msg.html">
+      <div style="border-bottom: 1px solid #ccc;">
+        我的信息
+        <div class="icoDiv">
+          <span class="ico btn_jiantou_lvse_zuo"></span>
+        </div>
+      </div>
+    </a>
+    <div onclick="intoFavorite()">
+      我的收藏
+      <div class="icoDiv">
+        <span class="ico btn_jiantou_lvse_zuo"></span>
+      </div>
+    </div>
+  </div>
+  <div class="group">
+    <a href="violation.html">
+      <div>
+        查询违章
+        <div class="icoDiv">
+          <span class="ico btn_jiantou_lvse_zuo"></span>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="group">
+    <div onclick="callView('setting')">
+      设置中心
+      <div class="icoDiv">
+        <span class="ico btn_jiantou_lvse_zuo"></span>
+      </div>
+    </div>
+  </div>
+  <div class="group">
+    <div onclick="logout()">
+      退出系统
+    </div>
+  </div>
+
+  <div id="setting" class="child_view" style="background:#eee">
+    <div class="nav_top" id="nav_top">
+      <div class="back_div" onclick="viewBack(this)">
+            <span class="ico nav_icon_back"></span>
+        </div>
+      设置中心
+    </div>
+
+    <div class="group">
+      <a href="user_detail.html">
+        <div class="user_inof">
+          <div class="icon" style="  width: 4em;line-height: 0em;">
+            <img src="">
+          </div>
+          <div style="padding-left: .5em;line-height: 1.75;">
+            <div>
+              <span id="cust_name"></span>
+              <span class="ico icon_man" id="sex"></span>
+            </div>
+            <div>
+              账户余额：<span id="noti_count">0</span>元
+            </div>
+          </div>
+          <div class="code" onclick="makeQRcode()">
+            <span class="ico ewm"></span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="group">
+      <a href="add_car.html">
+        <div style="border-bottom: 1px solid #ccc;">
+          我的爱车
+        </div>
+      </a>
+      <a href="card_manage.html">
+        <div>
+          管理卡片
+        </div>
+      </a>
+    </div>
+    <div class="group">
+      <div onclick="callView('about')">
+        关于叭叭
+      </div>
+    </div>
+    <div onclick="logout()"id="logout">退出登录</div>
+  </div>
+
+  <div class="child_view" id="about">
+    <div class="nav_top">
+      <div class="back_div" onclick="viewBack(this)">
+            <span class="ico nav_icon_back"></span>
+        </div>
+      关于叭叭
+    </div>
+    <div class="main" style="text-align: center;padding-top: 50px;">
+      <img src="img/icon_new.png" style="width:40%">
+      <div style="position: fixed;width: 100%;top: 50%;color: #4EA153;font-weight: 700;">叭叭HTML5_V1</div>
+      <div style="  position: fixed;width: 100%;bottom: 0;line-height: 3em;">
+        <a href="http://www.bibibaba.cn" style="color: #4EA153;" target="_blank">http://www.bibibaba.cn</a>
+        <h5 style="color: #aaa;">Copyright@2014 Bibibaba Inc.</h5>
+      </div>
+    </div>
+  </div>
+
+  <div class="child_view" id="my_favorite">
+    <div class="nav_top">
+      <div class="back_div" onclick="viewBack(this)">
+            <span class="ico nav_icon_back"></span>
+        </div>
+      我的收藏
+    </div>
+    <div class="main">
+      <div name="shop" id="shop_m" style="display:none">
+        <div class="name" data-tit="title">
+          <div class="name_t">title<div style="float: right;"><span class="ico body_share" onclick="share(this)"></span></div></div>
+          <div class="del" onclick="del(this)" data-id="favorite_id">删除</div>
+        </div>
+        <div class="add" onclick="toMap(this)">地址：<span data-lon="point_lon" data-lat="point_lat">address</span>
+          <div style="float: right;padding-right: .3em;"><span class="ico body_icon_lbs_l" style="width: 1em;height: 1.5em;"></span></div>
+        </div>
+        <div class="tel">
+        <a href="tel:phoneNumber" style="text-decoration:none;color: #123">
+          电话：phoneNumber
+          <div style="float: right;padding-right: .3em;"><span class="ico body_icon_phone" style="width: 1em;height: 1.14em;"></span></div>
+        </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="child_view" id="my_favorite">
+    <div class="nav_top">
+      <div class="back_div" onclick="viewBack(this)">
+            <span class="ico nav_icon_back"></span>
+        </div>
+      我的收藏
+    </div>
+    <div class="main">
+    </div>
+  </div>
+
+</body>
+</html>

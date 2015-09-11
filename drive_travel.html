@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>车辆行程</title>
+
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+  <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=DjMyWnXm12o3esdcWR8gIQLm"></script>
+  <script type="text/javascript" src="js/public.js"></script>
+  <script type="text/javascript" src="js/drive_travel.js"></script>
+</head>
+<style>
+  td{padding:0;}
+  body{padding-bottom: 0;height: 100%;}
+  .card{box-shadow: none;margin: 10px 0 0 0;}
+  #main_body{overflow-y: auto;margin-top: .5em}
+  #main_body>.card{padding-top: .5em}
+  #main_body>.card:first-of-type{margin-top: 0}
+  .card:last-of-type{border:none;}
+  table{width: 100%;font-size: .97em;padding: 0 .5em;text-align: left}
+  .a{line-height: 3em;color: #aaa;}
+  .b{background-color: #eee;font-size: .95em;color: #000;line-height: 2em;}
+  .c>.ico{margin-left: .9em;}
+  t{padding: 0 .5em}
+  .c{padding: 0 1.5em;text-align: right;}
+
+  #main_body>.card.top{position: absolute;width: 100%;padding-top:60px;margin:0;height: 100%;overflow-y:hidden;-webkit-animation: moveTop .5s;-webkit-animation-fill-mode: forwards;}
+  @-webkit-keyframes moveTop{
+  to {top: 0px;}
+  }
+
+  .card.top .c{display: none}
+  #allmap{background:rgb(243, 241, 236);-webkit-animation: move .8s;height: 80%}
+  @-webkit-keyframes move{
+  from{-webkit-transform:translate3d(0,100%,0)}
+  to {-webkit-transform:translate3d(0,0,0)}
+  }
+  #main_body>.card>h4{display: none;}
+  #main_body>.card>.h4{padding: .5em;margin: 0;border-bottom: 1px solid #ccc;display: block;}
+</style>
+<body>
+  <div class="nav_top">
+    <div style="padding-left:1.2em;position: absolute;">
+      <span class="ico nav_icon_back"></span>
+    </div>
+    <span id="car_name">车辆行程</span>
+  </div>
+
+  <div class="card">
+    <div class="card_nav">
+      <h4 style="margin: 0;line-height: 29px;color: #1BADED;font-weight: 100;text-align: center;">
+        <span class="ico ico_drive_date_left" onclick="next(false)"></span>
+        &nbsp;&nbsp;<t id="date">当前日期</t>&nbsp;&nbsp;
+        <span class="ico ico_drive_date_right" onclick="next(true)"></span>
+      </h4>
+    </div>
+    <div class="card_body">
+      <table>
+        <tr>
+          <td>行程总里程：</td>
+          <td id="total_distance">00KM</td>
+          <td>油耗：</td>
+          <td id="total_fuel">0.0L</td>
+        </tr>
+        <tr>
+          <td>百公里油耗：</td>
+          <td id="avg_fuel">00.0L</td>
+          <td>花费：</td>
+          <td id="total_fee">00.0元</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div id="main_body">
+    <div class="card" style="display:none" id="one_card">
+      <h4 class="trip_class">trip_name</h4>
+      <div>
+        <table>
+          <tr>
+            <td>起点：</td>
+            <td name="start_add" data-lon="start_lon" data-lat="start_lat" data-add="1"></td>
+            <td onclick="toMap(this)"><span class="ico body_icon_lbs_l" style="font-size:.8em"></span></td>
+            <td data-starT="starT">start_time</td>
+          </tr>
+          <tr>
+            <td>终点：</td>
+            <td name="end_add" data-lon="end_lon" data-lat="end_lat" data-add="1"></td>
+            <td onclick="toMap(this)"><span class="ico body_icon_lbs_l" style="font-size:.8em"></span></td>
+            <td data-endT="endT">end_time</td>
+          </tr>
+        </table>
+      </div>
+      <div class="a">
+        <t>共cur_distance公里\interval_time分钟</t>
+        <div class="b">
+          <table>
+            <tr>
+              <td>百公里油耗：</td>
+              <td>avg_fuelL</td>
+              <td>油耗：</td>
+              <td>cur_fuelL</td>
+            </tr>
+            <tr>
+              <td>平均速度：</td>
+              <td>avg_speedkm/h</td>
+              <td>花费：</td>
+              <td>cur_fee元</td>
+            </tr>
+          </table>
+        </div>
+        <div class="c">
+          <span class="ico body_share"></span>
+          <span class="ico body_icon_lbs_l" onclick="showMap(this)"></span>
+          <span class="ico ico_shop_8" onclick="showMove(this)"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="set_v">
+    <div class="set">
+    <div class="set_title">更多</div>
+      <ul>
+        <li onclick="collectAdress()">收藏终点</li>
+        <li onclick="deleteTravel()">删除行程</li>
+        <li onclick="renameTravel()">重命名</li>
+        <li onclick="actAvgFuel()">实际油耗</li>
+        <li style="text-align: center;font-size: .9em;" onclick="$('.set_v').fadeOut(300)">取消</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

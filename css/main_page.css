@@ -1,0 +1,96 @@
+  .search_text{position: relative;left: -2.2em;height: 2.5em;border-radius: .5em;border: none;width: 90%;padding-left: 2em;line-height: 2.5em;}
+  #search_result{overflow-y: auto;}
+  #choose_way>div,#search_result>div{background-color: #fff;margin: .5em;padding: .5em}
+  .body_icon_lbs_l{margin-right: .5em;}
+  #collect_adress,#choose_add{position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: #eee;z-index: 1033;padding-top: 50px;display: none;-webkit-animation: fromSmall .2s;}
+  .addDiv{border: 1px solid #999;border-radius: 5px;margin: .5em;padding: .5em 1em;background: #fff;position: relative;min-height: 3.8em;padding-right: 4em;}
+  .addIco{position: absolute;top: 1em;right: .5em;display: none}
+  [name=addDescription]+.addIco{display: block}
+  .card_head .ico{float:right;margin-right:5px}
+  [name='address']{margin:0;line-height:1em;font-weight:100;display:inline;color:#aaa;font-size:.9em;text-overflow:clip}
+  .nav_top{z-index: 1032}
+  [name="map"]{height: 300px}
+  .card nav{bottom: -50px}
+  .map_card{position: absolute;top: 0;left: 0;width: 100vw;height: 100vh;margin: 0;padding: 50px 0;z-index: 1031;}
+  .map_card nav{-webkit-animation: fromDown .5s;bottom: 0;}
+  .map_card nav h4{border-left: 1px solid #ccc;}
+  .map_card #allmap{-webkit-animation: fromSmall .3s;}
+  .fromDown{-webkit-animation: fromDown .5s;}
+  .map #allmap{-webkit-animation: fromBig .3s;}
+
+  @-webkit-keyframes fromBig{
+    from {-webkit-transform: scale3d(1,2,1);}
+    to {-webkit-transform: scale3d(1,1,1);}
+  }
+  .show{display: block;}
+
+  #set_fence{text-align: center;background: rgba(255,255,255,.8)}
+  #set_fence>div{padding: 0 .5em}
+  #set_fence>div>.meun_but{}
+
+  .car_view>div{display: inline-block;}
+  #car_id{display: none}
+  .card{display: none}
+  [name=car_name]+.ico{font-size: 1.3em;}
+
+  #card_manage{background-color: rgba(0,0,0,0);}
+  #card_manage>div{position: absolute;bottom: 0;background-color: #eee;width: 100%;padding: 10px 5px;}
+  #card_manage>div>div{background-color: #fff;border-bottom: 1px solid #ccc;padding: .5em;line-height: 2.5em;text-align: center;}
+  .meun{left:0;box-shadow: 3px -3px 10px rgba(0,0,0,.3);border-radius: 0;z-index: 1029;}
+  .out_side{border-top: 1px solid #aaa;color: #000;padding: .2em 1em}
+  .out_score{font-size: 1.5em;font-family: fantasy;float: right;line-height: 2.2em}
+  .out_t{font-weight: 100;font-size: 1.2em}
+  .out_add{font-weight: 100;font-size: .9em;color: #aaa}
+  .set_but{border-top: 1px solid #ccc;padding: .3em;}
+  .set_but>div{display: inline-block;width: 24%;padding: 1em;}
+  .set_but img{width: 100%;}
+  .title_h4{margin: 0;font-weight: 100;color: #aaa;text-align: center;}
+  .day_line{
+    background-color: rgba(0,0,0,.7);
+    color: #ccc;
+    font-weight: 100;
+    width: 100%;
+    height: 100%;
+    padding: 70px .5em .5em;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1030;
+    -webkit-transition: -webkit-transform .5s;
+    -webkit-transform: translate3d(0,100%,0);
+  }
+  .day_line>.ico_down{float: left;margin: 0;}
+  .day_line>h3{font-weight: 100;text-align: center;}
+  .svg_div{padding-left: 2em;position: relative;}
+  .svg_div>div{
+  border-bottom: 1px solid #eee;
+  border-left: 3px solid;
+  position: relative;
+  height: 3.9em;}
+  .svg_div>div>span:nth-of-type(1){
+    display: block;
+    position: absolute;
+    top: -0.7em;
+    left: -2.5em;
+    width: 2em;
+    text-align: right;
+  }
+  .svg_div>div>span:nth-of-type(2){position: absolute;bottom: 1.4em;right: .2em;}
+  #mainCard{overflow: hidden;}
+  canvas#line{    
+    position: absolute;
+    bottom: -5px;
+    width: 100%;
+    height: 100%;
+    left: -5px;
+    padding-left: 2em;}
+  .line_x{padding-left: 2em;}
+  .line_x>span{width: 20%;display: inline-block;}
+  #mainCard.show_line>div:not(.day_line){-webkit-filter: blur(3px);}
+  #mainCard.show_line>.day_line{-webkit-transform: translate3d(0,0,0);}
+  .blur>.card:not(#mainCard){-webkit-filter: blur(3px);}
+  .auto:before{content:"自动模式";}
+  .not_auto:before{content: "手动模式";}
+  .speed[data-speed="1"]:before{content: "低转速";}
+  .speed[data-speed="2"]:before{content: "中转速";}
+  .speed[data-speed="3"]:before{content: "高转速";}

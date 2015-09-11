@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>设置界面</title>
+
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+  <script type="text/javascript" src="js/public.js"></script>
+</head>
+<style>
+  body{height: 100%;width: 100%;}
+  .form-control{margin: 0 5px}
+  .status{right: 1em;left: auto;}
+  .set_body{background-color: #fff}
+  .set_view{border-radius: 4px;color: #555;text-shadow: 0px 0px 1px #ccc;}
+  .status{height: 2em;width: 4em;padding: .1em;}
+  .main_but.status:before{height:1.8em;width: 1.8em;left: 2.1em;}
+  .main_but.status.off:before{left: .1em;}
+
+  .set_view>div{line-height: 3.5em;position: relative;padding: 0 1em;border-bottom: 1px solid #ddd;}
+  [type="time"]{width: 6em;color: #6BC1E2;border:none;margin-left: 1em;font-family: 幼圆;font-size: 1.2em;}
+  [type="time"]:focus{outline:none;}
+  .r5_c1,.r7_c1{    
+    font-size: 1.5em;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    left: 0;
+  }
+  .width80{width: 100%;display:inline-block;padding-left: 2.8em;position: relative;}
+  .width80>div{border-top:1px solid #ccc;}
+  .ico_down{right: 1.2em;left: auto;}
+  .right{-webkit-transform: rotate(-90deg);}
+  .time_long{margin-left: -1em;line-height: 1.5em;padding: 1.5em;height: 4em;}
+  .time_long>div{border-bottom: 2px solid #bbb;display: inline-block;width: 33.33333%;text-align: center;position: relative;}
+  .time_long>div:before{content:"";display: block;width: .5em;height: .5em;border-radius: 50%;background-color: #bbb;position: absolute;bottom: -.3em;}
+  .time_long span{position: absolute;left: -1em;bottom: 1em;font-size: .8em}
+  .time_long>div:last-of-type{width: 0;}
+  .time_long>div:last-of-type>span{left: -2.5em;white-space:pre;}
+  .time_long .active_tag{
+    height: 1.8em;
+    width: 1.8em;
+    background: #fff;
+    border-radius: 100%;
+    position: relative;
+    box-shadow: -2px 2px .2em #888,0 0 .2em #888;
+    bottom: 1.4em;
+    left: -0.9em;
+    display: inline-block;
+    margin-left: 0%;
+    transition: margin-left .2s;-webkit-transition: margin-left .2s;
+  }
+  .time_long>div:last-of-type.active:before{bottom: -.5em}
+  .time_long:target{display: block;}
+</style>
+<body>
+  <div class="nav_top">
+    <div class="back_div" onclick="history.back()">
+      <span class="ico nav_icon_back"></span>
+    </div>
+    设置
+  </div>
+  <div class="set_body">
+    <div class="set_view" style="line-height: 3.5em;">
+      <div>
+        智能模式
+        <div class="main_but status center_y" id="mode" data-mode="1"></div>
+      </div>
+    </div>
+    <div class="set_view">
+      <div style="border:none">
+        定时开启净化
+        <div class="main_but status center_y off" onclick="changeStatus(this)"></div>
+      </div>
+      <div style="padding-right:0">
+        <div class="width80">
+          <span class="ico r5_c1"></span>
+          <div>
+            定时开启
+            <input type="time" value="08:00" id="time">
+            <span class="ico ico_down center_y right"></span>
+          </div>
+        </div>
+        <div class="width80">
+          <span class="ico r7_c1"></span>
+          <div style="border-bottom:1px solid #ccc;">
+            净化时长
+            <span type="time" id="duration" data-value="30">30分钟</span>
+            <span class="ico ico_down center_y"></span>
+          </div>
+        </div>
+        <div class="time_long">
+          <div data-i="0">
+            <span>30分钟</span>
+          </div><div data-i="1">
+            <span>60分钟</span>
+          </div><div data-i="2">
+            <span>90分钟</span>
+          </div><div data-i="3">
+            <span>120分钟</span>
+          </div>
+          <span class="active_tag"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript">
+$(".time_long>div").on("touchstart",function(){
+  var i=$(this).attr("data-i");
+  selectTime(i);
+});
+
+$("#mode").on("touchend",setMode);
+
+function selectTime(i){
+  var time=30*i+30;
+  i=33*i;
+  C(".active_tag").style.marginLeft=i+"%";//"calc((100% - 3em)*"+i+" + 0.9em)";
+  C("span[type='time']").innerText=time+"分钟"
+  E("duration").setAttribute("data-value",time);
+}
+
+/**
+*@description 设置净化器模式
+*/
+function setMode(){
+  if(!_deviceId_)return;
+  var mode=this;
+
+  var m=trunMode(mode);
+  var data={
+    device_id:_deviceId_,
+    cmd_type:define.COMMAND_AIR_MODE,
+    params:{
+      air_mode:m
+    }
+  };
+  if(m==0){
+    data.params.air_time=E("time").value;
+    data.params.air_duration=E("duration").getAttribute("data-value");
+  }
+
+  $.ajax({
+    url:_apiUrl_+"command?auth_code="+_authCode_,
+    type:"post",
+    dataType:"json",
+    data:data,
+    timeout:15000,
+    success:function(json){
+      if(json.status_code){
+        trunMode(mode);
+        statusCode(json.status_code);
+      }
+    },
+    error:function(json){
+      trunMode(mode);
+      alert("设置失败"+json.statusText);
+    }
+  });
+}
+
+/**
+*@description 更改净化器显示的状态
+*@param 带data-mode属性的净化器div按钮元素
+*@return 代表净化器状态的数字 1为自动模式，0为手动模式
+*/
+function trunMode(h){
+  var mode=$(h);
+  var m=mode.attr("data-mode");
+  if(m==1){
+    m=0;
+  }else{
+    m=1;
+  }
+  mode.attr("data-mode",m);
+  changeStatus(mode);
+  return m;
+}
+</script>
+</html>

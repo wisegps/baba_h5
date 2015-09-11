@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>健康指数</title>
+
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+  <script type="text/javascript" src="js/public.js"></script>
+</head>
+<style>
+  body{background: #fff;}
+  #main_body{padding: 10px;}
+  .circle.w_50 img {width: 60%;left: 20%;}
+  #detailed{padding-left: 10px}
+  .detailed{border-left: 1px solid #ccc;padding-left: 1em}
+  .detailed>div{padding: 0 .4em;line-height: 3em;}
+  .detailed>div>span:last-of-type{color: #999;text-align: right;}
+  .detailed .ico{position: relative;left: -2em;}
+  .err{border: 1px solid #FF7F00;border-radius: 6px;color: #FF7F00}
+  .detailed>.err>span:last-of-type{color: #FF7F00}
+  .err .ico_detect_ok{background-image: url("img/ico_detect_fault.png");left: -2.1em;}
+  .jg{float: right;}
+</style>
+<body>
+  <div class="nav_top">
+    <div style="padding-left:1.2em;position: absolute;" onclick="history.back()">
+      <span class="ico nav_icon_back"></span>
+    </div>
+    <t id="car_name">车名</t>
+  </div>
+  <nav class="nav">
+      <div>
+        <a href="" id="insurance_tel">
+          <h4><span class="ico ico_car_rescue"></span> 救援</h4>
+        </a>
+      </div>
+      <div>
+        <a href="" id="maintain_tel">
+          <h4><span class="ico ico_car_insurance"></span> 报险</h4>
+        </a>
+      </div>
+      <div>
+        <a href="service.html">
+          <h4><span class="ico ico_car_repair"></span> 汽修</h4>
+        </a>
+      </div>
+  </nav>
+
+  <div id="main_body">
+    <div id="circle">
+      <div class="circle w_50" name="drive">
+        <img src="img/circle_dial_color.png">
+        <div class="shan">
+          <div name="1"></div>
+          <div name="2"></div>
+          <div name="0"></div>
+          <div name="3"></div>
+        </div>
+        <img src="img/circle_cursor.png" class="circle_turn" style="animation-play-state:paused;-webkit-animation-play-state:paused;">
+        <img src="img/circle_cover.png">
+        <div class="circle_content">
+        <h4>健康指数</h4>
+        <h2><t name="score">0</t><small>分</small></h2>
+        </div>
+      </div>
+    </div>
+    <div id="detailed">
+      <div class="detailed">
+        <div id="active_obd_err" onclick="goTo()">
+          <span class="ico ico_detect_ok"></span>
+          <span>故障检测系统</span>
+          <span class="jg">无故障码</span>
+        </div>
+        <div id="if_lt_dpdy_err" onclick="goTo('dpdy')">
+          <span class="ico ico_detect_ok"></span>
+          <span>电源系统</span>
+          <span class="jg">蓄电池状态良好</span>
+        </div>
+        <div id="if_lt_jqmkd_err" onclick="goTo('jqmkd')">
+          <span class="ico ico_detect_ok"></span>
+          <span>进气系统</span>
+          <span class="jg">节气门开度良好</span>
+        </div>
+        <div id="if_lt_fdjzs_err" onclick="goTo('fdjzs')">
+          <span class="ico ico_detect_ok"></span>
+          <span>怠速控制系统</span>
+          <span class="jg">怠速稳定</span>
+        </div>
+        <div id="if_lt_sw_err" onclick="goTo('sw')">
+          <span class="ico ico_detect_ok"></span>
+          <span>冷却系统</span>
+          <span class="jg">水温稳定</span>
+        </div>
+        <div id="if_lt_chqwd_err" onclick="goTo('chqwd')">
+          <span class="ico ico_detect_ok"></span>
+          <span>排放系统</span>
+          <span class="jg">三元催化器状态良好</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="child_view" id="health_detailed" style="padding:0">
+    <iframe src="health_detailed.html"></iframe>
+  </div>
+
+  <div class="child_view" id="fault_detail">
+    <div class="nav_top">
+      <div class="back_div" onclick="viewBack(this)">
+        <span class="ico nav_icon_back"></span>
+      </div>
+      故障码检测系统
+    </div>
+    <div class="main"></div>
+  </div>
+</body>
+<script type="text/javascript">
+var car_name=LS('car_name');//设备的昵称
+
+var carJson,is_online,is_stop;
+
+window.onload=function(){
+  try{
+    var healthData=LS('carInfo',1).health;
+    carJson=LS('carJson',1);
+    var gpsData=LS('active_gps_data',1);
+  }catch(err){
+    alert("数据异常，请重新进入");
+    history.back();
+  }
+  $("#car_name").text(car_name);
+  showData(healthData);
+
+  $("#insurance_tel").attr("href","tel:"+carJson.insurance_tel);
+  $("#maintain_tel").attr("href","tel:"+carJson.maintain_tel);
+
+  is_online=LS('carInfo',1).device.is_online;
+  is_stop=true;
+  if(is_online=="false")alert("车辆处于熄火状态，请先启动车辆，等待1到3分钟后，再进行车辆体检!");
+  else{
+    for (var i=0;i<gpsData.uni_status.length;i++){
+      if (gpsData.uni_status[i]==8196){
+        is_stop = false;
+        break;
+      }
+    }
+    if(is_stop)alert("车辆未启动，您可以查看历史平均数据。");
+  }
+}
+
+function showData(json){
+  setaa(json.health_score,$("[name='drive']"));
+
+  if(json.if_lt_dpdy_err) $("#if_lt_dpdy_err").addClass("err").find(".jg").text("蓄电池状态异常");
+  else $("#if_lt_dpdy_err").removeClass("err").find(".jg").text("蓄电池状态良好");
+
+  if(json.if_lt_jqmkd_err) $("#if_lt_jqmkd_err").addClass("err").find(".jg").text("节气门开度异常");
+  else $("#if_lt_jqmkd_err").removeClass("err").find(".jg").text("节气门开度良好");
+
+  if(json.if_lt_fdjzs_err) $("#if_lt_fdjzs_err").addClass("err").find(".jg").text("怠速异常");
+  else $("#if_lt_fdjzs_err").removeClass("err").find(".jg").text("怠速稳定");
+
+  if(json.if_lt_sw_err) $("#if_lt_sw_err").addClass("err").find(".jg").text("水温异常");
+  else $("#if_lt_sw_err").removeClass("err").find(".jg").text("水温稳定");
+
+  if(json.if_lt_chqwd_err) $("#if_lt_chqwd_err").addClass("err").find(".jg").text("三元催化器状态异常");
+  else $("#if_lt_chqwd_err").removeClass("err").find(".jg").text("三元催化器状态良好");
+
+  if(json.active_obd_err.length) $("#active_obd_err").addClass("err").find(".jg").text("检测系统异常");
+  else $("#active_obd_err").removeClass("err").find(".jg").text("无故障码");
+
+  $("#insurance_tel").attr("href","tel:"+carJson.insurance_tel);
+  $("#maintain_tel").attr("href","tel:"+carJson.maintain_tel);
+}
+
+function goTo(name){
+    C("#health_detailed iframe").contentWindow.showData(name);
+    callView("health_detailed");
+}
+
+function jsonData(){
+  var jObject=carJson.fault_content;
+  if(!jObject)
+    return;
+
+
+  var colors = [[83,181,220],[106,195,149],[133,208,66],[245,149,91],[248,127,96],[255,105,105]];
+  var max_level = jObject.max_level;
+  var advice = jObject.advice;
+  var jsonArray = jObject.data;
+  if(jsonArray.length() == 0){
+    //iv_clear_obd.setVisibility(View.GONE);
+  }else{
+    //iv_clear_obd.setVisibility(View.VISIBLE);
+  }
+  if(max_level < 0){
+    max_level = 0;
+  };
+  if(max_level >= colors.length){
+    max_level = colors.length - 1;
+  };
+  var color = colors[max_level];
+  //tv_fault.setTextColor(Color.rgb(color[0], color[1], [2]));
+  //tv_fault.setText(advice);
+  var jsonObject = jsonArray[i];
+  for(var i = 0 ; i < jsonArray.length; i++){/*
+    FaultData faultData = new FaultData();
+    faultData.setLevel(jsonObject.level);
+    faultData.setC_define(jsonObject.getString("code") + "  " +jsonObject.getString("c_define"));
+    faultData.setContent(jsonObject.getString("content"));
+    faultData.setCategory(jsonObject.getString("category"));
+    faultDatas.add(faultData);*/
+  }
+}
+</script>
+</html>

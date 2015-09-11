@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>添加爱车</title>
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="js/public.js"></script>
+    <script type="text/javascript" src="js/add_car.js"></script>
+</head>
+<style type="text/css">
+	.car{padding: .5em;background-color: #fff;border-bottom: 1px solid #ccc;position: relative;width:50%}
+	.car img{width: 3.3em;height: 3.3em;margin-right: .5em}
+	.car>div{display: inline-block;}
+	.brank{font-size: 1.2em;margin-bottom:.5em}
+	.add_car{text-align: center;padding: .6em;background-color: #fff;}
+	.binding{font-size: 1.1em;border-radius: 4px;color: #fff;line-height: 1em;position: absolute;background-color: #0BA386;padding: .5em .3em;margin: .6em 0;right: .5em;}
+	.binding:after{content: "绑定智能配件"}
+	.form{padding: .5em;line-height: 2.5em;}
+
+	.q_setting{color: #fff;width: 30%;height: 100%;vertical-align: top;}
+	.q_setting>div{border-right: 1px solid #ccc;display: inline-block;width: 33.3333%;height: 100%;vertical-align: top;position: relative;}
+	.q_setting>div>div{width: 2em;margin: auto;height: 2.5em;}
+	.q_setting>div:nth-of-type(1){background-color: #4DB8EF}
+	.q_setting>div:nth-of-type(2){background-color: #4DB8EF}
+	.q_setting>div:nth-of-type(3){background-color: #F56D77}
+	.main_div{width: 100%;overflow: hidden;}
+	.car_view{height:4.5em;width: 200%;-webkit-transform: translate3d(0, 0, 0);-webkit-transition: -webkit-transform .4s;}
+	.show_q{-webkit-transform: translate3d(-30%, 0, 0);}
+	.car_view>div{display: inline-block;}
+</style>
+<body>
+	<div class="nav_top" id="nav_top">
+		<div class="back_div" onclick="history.back()">
+	        <span class="ico nav_icon_back"></span>
+	    </div>
+		我的爱车
+	</div>
+	<div id="main_div" class="main_div">
+	</div>
+
+	<div class="child_view" id="add_car">
+		<div class="nav_top">
+			<div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+			添加爱车
+		</div>
+		<div class="form">
+			<label>车辆名称</label>
+			<input type="text" name="nick_name" class="form-control" placeholder="必填">
+			<label>车牌号</label>
+			<div style="position:relative">
+				<span class="sxj" style="left:2em"></span>
+				<t id="province" style="position:absolute;left:.8em;top: 1px;" onclick="callView('choose_province')">粤</t>
+				<input type="text" name="obj_name" class="form-control" placeholder="选填" style="padding-left: 2.8em;">
+			</div>
+			<div class="form-control" style="line-height: 28px;margin: .7em 0;overflow: hidden;" onclick="callView('carSeries')">	车型：<t name="car_series"></t>
+			</div>
+			<button class="form-control blue_but" onclick="add()">
+				添加
+			</button>
+		</div>
+	</div>
+
+	<div class="child_view no_pad" id="add_device">
+		<iframe src="add_device.html"></iframe>
+	</div>
+
+	<div class="child_view" id="choose_province">
+		<div class="nav_top">
+			<div class="back_div" onclick="viewBack(this)">
+		        <span class="ico nav_icon_back"></span>
+		    </div>
+			请选择车辆地区
+		</div>
+		<table rules="all" frame="box">
+			<tr>
+				<td>京</td><td>津</td><td>沪</td><td>渝</td>
+			</tr>
+			<tr>
+				<td>冀</td><td>豫</td><td>云</td><td>辽</td>
+			</tr>
+			<tr>
+				<td>黑</td><td>湘</td><td>皖</td><td>鲁</td>
+			</tr>
+			<tr>
+				<td>新</td><td>苏</td><td>浙</td><td>赣</td>
+			</tr>
+			<tr>
+				<td>鄂</td><td>桂</td><td>甘</td><td>晋</td>
+			</tr>
+			<tr>
+				<td>蒙</td><td>陕</td><td>吉</td><td>闽</td>
+			</tr>
+			<tr>
+				<td>贵</td><td>粤</td><td>青</td><td>藏</td>
+			</tr>
+			<tr>
+				<td>川</td><td>宁</td><td>琼</td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="child_view no_pad" id="SMS">
+		<iframe src="SMS_verification.html"></iframe>
+	</div>
+
+	<div class="child_view no_pad" id="carSeries">
+      <iframe></iframe>
+    </div>
+</html>
